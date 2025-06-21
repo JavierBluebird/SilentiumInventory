@@ -3,6 +3,7 @@
 #include "SilentiumInventorySystem.h"
 
 #define LOCTEXT_NAMESPACE "FSilentiumInventorySystemModule"
+DEFINE_LOG_CATEGORY(LogSilentiumInventory)
 
 void FSilentiumInventorySystemModule::StartupModule()
 {

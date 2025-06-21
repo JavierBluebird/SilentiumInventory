@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSilentiumInventory, Log, All);
+
 class FSilentiumInventorySystemModule : public IModuleInterface
 {
 public:
