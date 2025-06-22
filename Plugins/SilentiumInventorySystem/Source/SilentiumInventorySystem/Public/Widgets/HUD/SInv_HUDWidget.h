@@ -13,4 +13,13 @@ UCLASS()
 class SILENTIUMINVENTORYSYSTEM_API USInv_HUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	
+public:
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "SilentiumInventory|HUD")
+	void ShowPickupMessage(const FString& Message);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "SilentiumInventory|HUD")
+	void HidePickupMessage();
+	
 };

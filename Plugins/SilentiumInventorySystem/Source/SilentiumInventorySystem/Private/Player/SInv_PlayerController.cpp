@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Items/Components/SInv_ItemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/HUD/SInv_HUDWidget.h"
 
@@ -12,6 +13,7 @@ ASInv_PlayerController::ASInv_PlayerController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	TraceLength = 500.f;
+	ItemTraceChannel = ECC_GameTraceChannel1;
 }
 
 void ASInv_PlayerController::BeginPlay()
@@ -79,11 +81,20 @@ void ASInv_PlayerController::TraceForItem()
 	LastActor = CurrentActor; // Value CurrentActor was last frame. Can be nullptr.
 	CurrentActor = HitResult.GetActor();
 
+	if (!CurrentActor.IsValid())
+	{
+		if (IsValid(HUDWidget)) HUDWidget->HidePickupMessage(); // Hide message if we are not tracking any actor.
+	}
+	
 	if (CurrentActor == LastActor) return;
 
 	if (CurrentActor.IsValid()) // Weak Pointer wrapper function.
 	{
 		UE_LOG(LogTemp,Warning,TEXT("Started tracing a new Actor."));
+		USInv_ItemComponent* ItemComponent = CurrentActor->FindComponentByClass<USInv_ItemComponent>();
+		if (!ItemComponent) return; // if its not valid, return
+
+		if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(ItemComponent->GetPickupMessage());
 	}
 
 	if (LastActor.IsValid())
