@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Interaction/SInv_Highlightable.h"
 #include "Items/Components/SInv_ItemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/HUD/SInv_HUDWidget.h"
@@ -90,15 +91,25 @@ void ASInv_PlayerController::TraceForItem()
 
 	if (CurrentActor.IsValid()) // Weak Pointer wrapper function.
 	{
+		if (UActorComponent* Highlightable = CurrentActor->FindComponentByInterface(USInv_Highlightable::StaticClass()))
+		{
+			ISInv_Highlightable::Execute_Highlight(Highlightable); // Executes interface function on Highlightable AC
+		}
+		
 		UE_LOG(LogTemp,Warning,TEXT("Started tracing a new Actor."));
 		USInv_ItemComponent* ItemComponent = CurrentActor->FindComponentByClass<USInv_ItemComponent>();
+		
 		if (!ItemComponent) return; // if its not valid, return
-
+		
 		if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(ItemComponent->GetPickupMessage());
 	}
 
 	if (LastActor.IsValid())
 	{
+		if (UActorComponent* Highlightable = LastActor->FindComponentByInterface(USInv_Highlightable::StaticClass()))
+		{
+			ISInv_Highlightable::Execute_UnHighlight(Highlightable); // Executes interface function on Highlightable AC
+		}
 		UE_LOG(LogTemp,Warning,TEXT("Stopped tracing last actor."));
 	}
 	
