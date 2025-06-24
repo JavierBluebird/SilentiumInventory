@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Interaction/SInv_Highlightable.h"
+#include "InventoryManagement/Components/SInv_InventoryComponent.h"
 #include "Items/Components/SInv_ItemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/HUD/SInv_HUDWidget.h"
@@ -30,6 +31,7 @@ void ASInv_PlayerController::BeginPlay()
 				InputSubsystem->AddMappingContext(CurrentContext, 0);
 			}
 	}
+	InventoryComponent = FindComponentByClass<USInv_InventoryComponent>(); // Even if its in BP, it will be found.
 	CreateHUDWidget();
 }
 
@@ -47,8 +49,8 @@ void ASInv_PlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &ASInv_PlayerController::PrimaryInteract);
+	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &ASInv_PlayerController::ToggleInventory);
 }
-
 
 void ASInv_PlayerController::CreateHUDWidget()
 {
@@ -60,6 +62,12 @@ void ASInv_PlayerController::CreateHUDWidget()
 	{
 		HUDWidget->AddToViewport();
 	}
+}
+
+void ASInv_PlayerController::ToggleInventory()
+{
+	if (!InventoryComponent.IsValid()) return; // weak pointer, needs to be validated.
+	InventoryComponent->ToggleInventoryMenu();
 }
 
 void ASInv_PlayerController::TraceForItem()

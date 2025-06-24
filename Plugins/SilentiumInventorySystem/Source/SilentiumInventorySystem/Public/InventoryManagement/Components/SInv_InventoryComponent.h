@@ -17,6 +17,8 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorCompo
 public:
 
 	USInv_InventoryComponent();
+	
+	void ToggleInventoryMenu();
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,5 +34,11 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USInv_InventoryBase> InventoryMenuReference;
+
+	// Inventory State Related variables
+	bool bInventoryMenuOpen;
+	void OpenInventoryMenu();
+	void CloseInventoryMenu();
+
 
 };

@@ -26,4 +26,47 @@ void USInv_InventoryComponent::ConstructInventory()
 
 	InventoryMenuReference = CreateWidget<USInv_InventoryBase>(OwningController.Get(), InventoryMenuClass);
 	InventoryMenuReference->AddToViewport();
+
+	CloseInventoryMenu(); 
+}
+
+
+void USInv_InventoryComponent::ToggleInventoryMenu()
+{
+	if (bInventoryMenuOpen)
+	{
+		CloseInventoryMenu();
+	}
+	else
+	{
+		OpenInventoryMenu();
+	}
+}
+void USInv_InventoryComponent::OpenInventoryMenu()
+{
+	if (!IsValid(InventoryMenuReference)) return;
+
+	InventoryMenuReference->SetVisibility(ESlateVisibility::Visible);
+	bInventoryMenuOpen = true;
+
+	if (!OwningController.IsValid()) return;
+
+	FInputModeGameAndUI InputMode;
+	OwningController->SetInputMode(InputMode);
+	OwningController->SetShowMouseCursor(true);
+}
+
+void USInv_InventoryComponent::CloseInventoryMenu()
+{
+	if (!IsValid(InventoryMenuReference)) return;
+
+	InventoryMenuReference->SetVisibility(ESlateVisibility::Collapsed);
+
+	bInventoryMenuOpen = false;
+
+	if (!OwningController.IsValid()) return;
+
+	FInputModeGameOnly InputMode;
+	OwningController->SetInputMode(InputMode);
+	OwningController->SetShowMouseCursor(false);
 }
