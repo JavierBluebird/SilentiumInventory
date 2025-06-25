@@ -7,7 +7,11 @@
 #include "SInv_InventoryComponent.generated.h"
 
 
+class USInv_InventoryItem;
 class USInv_InventoryBase;
+
+// Delegate of Item Added or Removed on FastArray.cpp
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChanged, USInv_InventoryItem*, Item);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorComponent
@@ -19,6 +23,9 @@ public:
 	USInv_InventoryComponent();
 	
 	void ToggleInventoryMenu();
+	
+	FInventoryItemChanged OnItemAdded;
+	FInventoryItemChanged OnItemRemoved;
 
 protected:
 	virtual void BeginPlay() override;

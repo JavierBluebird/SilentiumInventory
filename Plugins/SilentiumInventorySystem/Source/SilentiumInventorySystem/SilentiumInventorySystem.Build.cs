@@ -40,7 +40,8 @@ public class SilentiumInventorySystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"UMG"
+				"UMG",
+				"EnhancedInput"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -84,7 +84,7 @@ struct FSInv_InventoryFastArray : public FFastArraySerializer
 		TObjectPtr<UActorComponent> OwnerComponent;
 
 		// Replicated list of Items
-		UPROPERTY(Replicated)
+		UPROPERTY()
 		TArray<FSInv_InventoryEntry> ItemEntriesArray;
 };
 
@@ -92,4 +92,5 @@ template<>
 struct TStructOpsTypeTraits<FSInv_InventoryFastArray> : public TStructOpsTypeTraitsBase2<FSInv_InventoryFastArray>
 {
 	enum { WithNetDeltaSerializer = true };
+	
 };
