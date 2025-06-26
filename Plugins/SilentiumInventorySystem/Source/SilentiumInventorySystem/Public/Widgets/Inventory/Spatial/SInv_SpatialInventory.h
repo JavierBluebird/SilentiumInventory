@@ -22,6 +22,7 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_SpatialInventory : public USInv_Invento
 public:
 	
 	virtual void NativeOnInitialized() override;
+	virtual FSInv_SlotAvailabilityResult HasRoomForItem(USInv_ItemComponent* ItemComponent) const override;
 	
 private:
 

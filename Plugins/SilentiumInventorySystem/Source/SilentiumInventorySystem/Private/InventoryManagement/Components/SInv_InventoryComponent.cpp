@@ -10,6 +10,19 @@ USInv_InventoryComponent::USInv_InventoryComponent()
 
 }
 
+void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
+{
+	FSInv_SlotAvailabilityResult Result = InventoryMenuReference->HasRoomForItem(ItemComponent);
+
+	// Zero value will be taken as No Room for this Item in Inventory.
+	if (Result.TotalRoomToFill == 0)
+	{
+		NoRoomInInventory.Broadcast();
+		return;
+	}
+	// TODO: Actually add the Item to the Inventory
+}
+
 void USInv_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();

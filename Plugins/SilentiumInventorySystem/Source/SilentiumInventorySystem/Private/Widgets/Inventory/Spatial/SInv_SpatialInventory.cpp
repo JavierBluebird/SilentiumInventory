@@ -20,6 +20,12 @@ void USInv_SpatialInventory::NativeOnInitialized()
 	ShowEquippables();
 }
 
+FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemComponent* ItemComponent) const
+{
+	return FSInv_SlotAvailabilityResult();
+}
+
+
 void USInv_SpatialInventory::ShowEquippables()
 {
 	SetActiveGrid(Grid_Equippables, Button_Equippables);

@@ -7,11 +7,13 @@
 #include "SInv_InventoryComponent.generated.h"
 
 
+class USInv_ItemComponent;
 class USInv_InventoryItem;
 class USInv_InventoryBase;
 
 // Delegate of Item Added or Removed on FastArray.cpp
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChanged, USInv_InventoryItem*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorComponent
@@ -21,11 +23,15 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorCompo
 public:
 
 	USInv_InventoryComponent();
+
+	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly, Category = "Silentium Inventory")
+	void TryAddItem(USInv_ItemComponent* ItemComponent);
 	
 	void ToggleInventoryMenu();
 	
 	FInventoryItemChanged OnItemAdded;
 	FInventoryItemChanged OnItemRemoved;
+	FNoRoomInInventory NoRoomInInventory;
 
 protected:
 	virtual void BeginPlay() override;

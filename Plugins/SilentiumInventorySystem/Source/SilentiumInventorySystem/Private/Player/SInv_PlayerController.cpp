@@ -125,5 +125,10 @@ void ASInv_PlayerController::TraceForItem()
 
 void ASInv_PlayerController::PrimaryInteract()
 {
-	UE_LOG(LogTemp, Display, TEXT("Primary Interact"));
+	if (!CurrentActor.IsValid()) return;
+
+	USInv_ItemComponent* ItemComponent = CurrentActor->FindComponentByClass<USInv_ItemComponent>();
+	
+	if (!IsValid(ItemComponent) || !InventoryComponent.IsValid()) return;
+	InventoryComponent->TryAddItem(ItemComponent);
 }
