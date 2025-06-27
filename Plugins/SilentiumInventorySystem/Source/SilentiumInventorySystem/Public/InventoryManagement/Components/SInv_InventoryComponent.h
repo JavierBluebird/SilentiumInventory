@@ -26,6 +26,13 @@ public:
 
 	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly, Category = "Silentium Inventory")
 	void TryAddItem(USInv_ItemComponent* ItemComponent);
+
+	UFUNCTION(Server,Reliable)
+	void Server_AddNewItem(USInv_ItemComponent* ItemComponent, int32 StackCount);
+
+	UFUNCTION(Server,Reliable)
+	void Server_AddStacksToItem(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
+	
 	
 	void ToggleInventoryMenu();
 	

@@ -10,19 +10,6 @@ USInv_InventoryComponent::USInv_InventoryComponent()
 
 }
 
-void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
-{
-	FSInv_SlotAvailabilityResult Result = InventoryMenuReference->HasRoomForItem(ItemComponent);
-
-	// Zero value will be taken as No Room for this Item in Inventory.
-	if (Result.TotalRoomToFill == 0)
-	{
-		NoRoomInInventory.Broadcast();
-		return;
-	}
-	// TODO: Actually add the Item to the Inventory
-}
-
 void USInv_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -82,4 +69,39 @@ void USInv_InventoryComponent::CloseInventoryMenu()
 	FInputModeGameOnly InputMode;
 	OwningController->SetInputMode(InputMode);
 	OwningController->SetShowMouseCursor(false);
+}
+
+void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
+{
+	FSInv_SlotAvailabilityResult Result = InventoryMenuReference->HasRoomForItem(ItemComponent);
+
+	// Zero value will be taken as No Room for this Item in Inventory.
+	if (Result.TotalRoomToFill == 0)
+	{
+		NoRoomInInventory.Broadcast();
+		return;
+	}
+	
+	if (Result.Item.IsValid() && Result.bStackable == true)
+	{
+		// Add Stacks to an Item that already exists in the Inventory. We only want to update the stack count,
+		// not create a new Item of this type.
+		Server_AddStacksToItem(ItemComponent,Result.TotalRoomToFill, Result.Remainder);
+	}
+	else if (Result.TotalRoomToFill > 0) 
+	{
+		// This item type doesn't exist in the inventory. Create a new one and update all pertinent slots.
+		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0);
+	}
+}
+
+void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount)
+{
+	
+}
+
+void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemComponent* ItemComponent,
+	int32 StackCount, int32 Remainder)
+{
+	
 }
