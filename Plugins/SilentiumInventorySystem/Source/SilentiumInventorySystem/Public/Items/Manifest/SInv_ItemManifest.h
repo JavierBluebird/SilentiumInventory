@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Types/SInv_GridTypes.h"
 #include "StructUtils/InstancedStruct.h"
 #include "SInv_ItemManifest.generated.h"
@@ -23,10 +24,16 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	
 	// Category Getter
 	ESInv_ItemCategory GetItemCategory() const {return ItemCategory;}
+	// Item Type Getter
+	FGameplayTag GetItemType() const { return ItemType; }
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	ESInv_ItemCategory ItemCategory { ESInv_ItemCategory::None };
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
+	FGameplayTag ItemType;
 };
 
 
