@@ -25,7 +25,6 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	ESInv_ItemCategory GetItemCategory() const {return ItemCategory;}
 	
 private:
-
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	ESInv_ItemCategory ItemCategory { ESInv_ItemCategory::None };
 };

@@ -3,6 +3,7 @@
 #include "ToolMenusEditor.h"
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
 #include "Items/SInv_InventoryItem.h"
+#include "Items/Components/SInv_ItemComponent.h"
 #include "Tests/ToolMenusTestUtilities.h"
 
 TArray<USInv_InventoryItem*> FSInv_InventoryFastArray::GetAllItems()
@@ -42,10 +43,24 @@ void FSInv_InventoryFastArray::PostReplicatedAdd(const TArrayView<int32> AddedIn
 	}
 }
 
-USInv_InventoryItem* FSInv_InventoryFastArray::AddItemEntry(USInv_InventoryComponent* ItemComponent)
+// This Function creates a New Item via Item Manifest.
+USInv_InventoryItem* FSInv_InventoryFastArray::AddItemEntry(USInv_ItemComponent* ItemComponent)
 {
-	// TODO: Implement once ItemComponent is more complete.
-	return nullptr;
+	// Inventory Component getters
+	check(OwnerComponent);
+	AActor* OwningActor = OwnerComponent->GetOwner();
+	
+	check(OwningActor->HasAuthority()); // Must be ran on Server
+	USInv_InventoryComponent* IC = Cast<USInv_InventoryComponent>(OwnerComponent);
+	if (!IsValid(IC)) return nullptr;
+
+	FSInv_InventoryEntry& NewItemEntry = ItemEntriesArray.AddDefaulted_GetRef(); // Adds an empty struct and get the ref.
+	NewItemEntry.Item = ItemComponent->GetItemManifest().Manifest(OwningActor); // Item Manifest createst the item
+
+	IC->AddRepSubObj(NewItemEntry.Item); // Adds Item as Replicated Subobject to Inv Component.
+	MarkItemDirty(NewItemEntry); // Fast Serializer
+	
+	return NewItemEntry.Item;
 }
 
 USInv_InventoryItem* FSInv_InventoryFastArray::AddItemEntry(USInv_InventoryItem* Item)

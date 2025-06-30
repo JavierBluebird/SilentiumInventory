@@ -15,8 +15,12 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryItem : public UObject
 {
 	GENERATED_BODY()
 
-private:
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"))
+	void SetItemManifest(const FSInv_ItemManifest& Manifest);
+	
+private:
+	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"), Replicated)
 	FInstancedStruct ItemManifest;
 };

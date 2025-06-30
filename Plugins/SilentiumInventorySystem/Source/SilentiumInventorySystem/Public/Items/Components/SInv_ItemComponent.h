@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Items/Manifest/SInv_ItemManifest.h"
 #include "SInv_ItemComponent.generated.h"
 
 
@@ -17,11 +18,14 @@ public:
 
 	FString GetPickupMessage() const {	return PickupMessage;	};
 
-protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-
+	FSInv_ItemManifest GetItemManifest() const {return ItemManifest;};
 private:
 
+	UPROPERTY(EditAnywhere,Category="Silentium Inventory", Replicated)
+	FSInv_ItemManifest ItemManifest;
+	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	FString PickupMessage;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "InventoryManagement/FastArray/SInv_FastArray.h"
 #include "SInv_InventoryComponent.generated.h"
 
 
@@ -32,13 +33,16 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void Server_AddStacksToItem(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
-	
+
+	void AddRepSubObj(UObject* SubObj);
 	
 	void ToggleInventoryMenu();
 	
 	FInventoryItemChanged OnItemAdded;
 	FInventoryItemChanged OnItemRemoved;
 	FNoRoomInInventory NoRoomInInventory;
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,6 +51,12 @@ private:
 	
 	void ConstructInventory();
 
+	//-----------------------
+	// FAST ARRAY SERIALIZER
+	//-----------------------
+	UPROPERTY(Replicated)
+	FSInv_InventoryFastArray InventoryList;
+	
 	TWeakObjectPtr<APlayerController> OwningController;
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System|HUD ")

@@ -2,13 +2,19 @@
 
 
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
+
+#include "Net/UnrealNetwork.h"
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 
 USInv_InventoryComponent::USInv_InventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
+	
+	SetIsReplicatedByDefault(true);
+	bReplicateUsingRegisteredSubObjectList = true;
+	bInventoryMenuOpen = false;
 }
+
 
 void USInv_InventoryComponent::BeginPlay()
 {
@@ -31,6 +37,15 @@ void USInv_InventoryComponent::ConstructInventory()
 }
 
 
+void USInv_InventoryComponent::AddRepSubObj(UObject* SubObj)
+{
+	if (IsUsingRegisteredSubObjectList() == true && IsReadyForReplication() == true
+		&& IsValid(SubObj))
+	{
+		AddReplicatedSubObject(SubObj);
+	}
+}
+
 void USInv_InventoryComponent::ToggleInventoryMenu()
 {
 	if (bInventoryMenuOpen)
@@ -42,6 +57,7 @@ void USInv_InventoryComponent::ToggleInventoryMenu()
 		OpenInventoryMenu();
 	}
 }
+
 void USInv_InventoryComponent::OpenInventoryMenu()
 {
 	if (!IsValid(InventoryMenuReference)) return;
@@ -95,13 +111,23 @@ void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 	}
 }
 
+// SERVER RPCS
+
 void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount)
 {
-	
+	USInv_InventoryItem* NewItem = InventoryList.AddItemEntry(ItemComponent);
+
+	// @TODO: Tell the Item Component to Destroy its owning actor
 }
 
 void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemComponent* ItemComponent,
 	int32 StackCount, int32 Remainder)
 {
 	
+}
+void USInv_InventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, InventoryList);
 }

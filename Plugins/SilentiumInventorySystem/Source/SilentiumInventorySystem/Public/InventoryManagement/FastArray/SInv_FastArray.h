@@ -6,6 +6,7 @@
 #include "SInv_FastArray.generated.h"
 
 
+class USInv_ItemComponent;
 class USInv_InventoryComponent;
 class USInv_InventoryItem;
 
@@ -71,7 +72,7 @@ struct FSInv_InventoryFastArray : public FFastArraySerializer
 		/*		Items Utility Functions			 */
 		/*---------------------------------------*/
 
-		USInv_InventoryItem* AddItemEntry(USInv_InventoryComponent* ItemComponent);
+		USInv_InventoryItem* AddItemEntry(USInv_ItemComponent* ItemComponent);
 		USInv_InventoryItem* AddItemEntry(USInv_InventoryItem* Item); // overload
 
 		void RemoveItemEntry(USInv_InventoryItem* Item);
