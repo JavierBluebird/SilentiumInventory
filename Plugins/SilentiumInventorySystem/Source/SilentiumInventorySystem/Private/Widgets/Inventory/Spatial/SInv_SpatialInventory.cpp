@@ -22,7 +22,10 @@ void USInv_SpatialInventory::NativeOnInitialized()
 
 FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemComponent* ItemComponent) const
 {
-	return FSInv_SlotAvailabilityResult();
+	FSInv_SlotAvailabilityResult Result;
+	Result.TotalRoomToFill = 1;
+	//return FSInv_SlotAvailabilityResult();
+	return Result;
 }
 
 

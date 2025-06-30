@@ -45,7 +45,6 @@ struct FSInv_InventoryFastArray : public FFastArraySerializer
 	GENERATED_BODY()
 
 	public:
-		
 		FSInv_InventoryFastArray() : OwnerComponent(nullptr) {}
 		FSInv_InventoryFastArray(UActorComponent* InOwnerComponent) : OwnerComponent(InOwnerComponent) {} // Overload
 

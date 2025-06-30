@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Items/SInv_InventoryItem.h"
 #include "Types/SInv_GridTypes.h"
 #include "SInv_InventoryGrid.generated.h"
 
+class USInv_InventoryComponent;
 class UCanvasPanel;
 class USInv_GridSlot;
 /**
@@ -21,7 +23,12 @@ public:
 	virtual void NativeOnInitialized() override;
 	ESInv_ItemCategory GetItemCategory() const { return ItemCategory; };
 
+	UFUNCTION()
+	void AddItem(USInv_InventoryItem* Item);
+	
 private:
+
+	TWeakObjectPtr<USInv_InventoryComponent> InventoryComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "Silentium Inventory")
 	ESInv_ItemCategory ItemCategory;
@@ -45,5 +52,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	float SlotSize;
+
+	bool MatchesCategory(const USInv_InventoryItem* Item) const;
 	
 };

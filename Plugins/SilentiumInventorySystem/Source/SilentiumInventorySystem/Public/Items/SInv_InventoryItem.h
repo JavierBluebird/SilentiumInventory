@@ -18,7 +18,15 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryItem : public UObject
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual bool IsSupportedForNetworking() const override { return true; }
+
 	void SetItemManifest(const FSInv_ItemManifest& Manifest);
+	
+	// Non-mutable reference Getter 
+	const FSInv_ItemManifest& GetItemManifest() const { return ItemManifest.Get<FSInv_ItemManifest>(); }
+
+	// Mutable Reference Getter
+	FSInv_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FSInv_ItemManifest>(); }
 	
 private:
 	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"), Replicated)

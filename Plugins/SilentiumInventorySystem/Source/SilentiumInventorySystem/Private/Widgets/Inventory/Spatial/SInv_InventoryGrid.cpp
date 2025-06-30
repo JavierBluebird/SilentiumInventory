@@ -6,15 +6,22 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "InventoryManagement/Components/SInv_InventoryComponent.h"
+#include "InventoryManagement/Utils/SInv_InventoryStatics.h"
 #include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
+#include "Items/SInv_InventoryItem.h"
 #include "Widgets/Utils/SInv_WidgetUtils.h"
 
 
 void USInv_InventoryGrid::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
+	
 	ConstructGrid();
+	InventoryComponent = USInv_InventoryStatics::
+						GetInventoryComponent(GetOwningPlayer());
+
+	InventoryComponent->OnItemAdded.AddDynamic(this,&ThisClass::AddItem);
 }
 
 void USInv_InventoryGrid::ConstructGrid()
@@ -44,4 +51,17 @@ void USInv_InventoryGrid::ConstructGrid()
 			GridSlotsArray.Add(GridSlot);
 		}
 	}
+}
+
+bool USInv_InventoryGrid::MatchesCategory(const USInv_InventoryItem* Item) const
+{
+	return Item->GetItemManifest().GetItemCategory() == ItemCategory;
+}
+
+// Called from InventoryComponent::AddNewItem OnItemAdded.Broadcast()
+void USInv_InventoryGrid::AddItem(USInv_InventoryItem* Item)
+{
+	if (!MatchesCategory(Item)) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("InventoryGrid::AddItem"));
 }

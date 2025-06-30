@@ -6,7 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 
-USInv_InventoryComponent::USInv_InventoryComponent()
+USInv_InventoryComponent::USInv_InventoryComponent() : InventoryList(this)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	
@@ -14,7 +14,6 @@ USInv_InventoryComponent::USInv_InventoryComponent()
 	bReplicateUsingRegisteredSubObjectList = true;
 	bInventoryMenuOpen = false;
 }
-
 
 void USInv_InventoryComponent::BeginPlay()
 {
@@ -115,8 +114,12 @@ void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 
 void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount)
 {
-	USInv_InventoryItem* NewItem = InventoryList.AddItemEntry(ItemComponent);
-
+	USInv_InventoryItem* NewItem = InventoryList.AddItemEntry(ItemComponent); // Adds the item to Inventory Array
+	if (GetOwner()->GetNetMode() == NM_ListenServer ||
+		GetOwner()->GetNetMode() == NM_Standalone)
+	{
+		OnItemAdded.Broadcast(NewItem); // Instant broadcast since we are the Server, not the Client. 
+	}
 	// @TODO: Tell the Item Component to Destroy its owning actor
 }
 
@@ -131,3 +134,4 @@ void USInv_InventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetime
 
 	DOREPLIFETIME(ThisClass, InventoryList);
 }
+

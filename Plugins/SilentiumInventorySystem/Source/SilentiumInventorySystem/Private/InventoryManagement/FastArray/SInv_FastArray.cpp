@@ -32,6 +32,7 @@ void FSInv_InventoryFastArray::PreReplicatedRemove(const TArrayView<int32> Remov
 	}
 }
 
+// Called on clients whenever a New Item is Added.
 void FSInv_InventoryFastArray::PostReplicatedAdd(const TArrayView<int32> AddedIndices, int32 FinalSize)
 {
 	USInv_InventoryComponent* IC = Cast<USInv_InventoryComponent>(OwnerComponent);
