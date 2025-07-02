@@ -6,12 +6,14 @@
 #include "StructUtils/InstancedStruct.h"
 #include "SInv_ItemManifest.generated.h"
 
+struct FSInv_ItemFragment;
 /*--------------------------------------------------------------------------------------*/
 /*																					   */
 /* Item Manifest contains all of the necessary data for creating a new Inventory Item */
 /*																				     */
 /*----------------------------------------------------------------------------------*/
 class USInv_InventoryItem;
+struct FSInv_ItemFragment;
 
 enum class ESInv_ItemCategory : uint8;
 
@@ -28,12 +30,16 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	FGameplayTag GetItemType() const { return ItemType; }
 	
 private:
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties", meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FSInv_ItemFragment>> Fragments;
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	ESInv_ItemCategory ItemCategory { ESInv_ItemCategory::None };
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	FGameplayTag ItemType;
+	
 };
 
 
