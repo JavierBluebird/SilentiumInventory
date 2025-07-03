@@ -128,6 +128,7 @@ void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemC
 {
 	
 }
+
 void USInv_InventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

@@ -6,7 +6,8 @@
 #include "UObject/Object.h"
 #include "SInv_InventoryStatics.generated.h"
 
-class USInv_InventoryComponent;
+struct FSInv_ItemManifest;
+class USInv_ItemComponent;
 /**
  * 
  */
@@ -19,4 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
 	static USInv_InventoryComponent* GetInventoryComponent(const APlayerController* PlayerController);
+
+	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
+	static ESInv_ItemCategory GetItemCategoryFromItemComp(const USInv_ItemComponent* ItemComp);
+	
 };

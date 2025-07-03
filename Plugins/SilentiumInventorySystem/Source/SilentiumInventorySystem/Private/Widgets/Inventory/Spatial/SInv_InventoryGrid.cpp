@@ -10,6 +10,8 @@
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
 #include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
 #include "Items/SInv_InventoryItem.h"
+#include "Items/Components/SInv_ItemComponent.h"
+#include "Items/Manifest/SInv_ItemManifest.h"
 #include "Widgets/Utils/SInv_WidgetUtils.h"
 
 
@@ -58,10 +60,54 @@ bool USInv_InventoryGrid::MatchesCategory(const USInv_InventoryItem* Item) const
 	return Item->GetItemManifest().GetItemCategory() == ItemCategory;
 }
 
+/*------------------------------------------*/
+/*		HasRoomForItem overloads			*/
+/*------------------------------------------*/
+FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const USInv_ItemComponent* ItemComponent)
+{
+	return HasRoomForItem(ItemComponent->GetItemManifest());
+}
+
+FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const USInv_InventoryItem* Item)
+{
+	return HasRoomForItem(Item->GetItemManifest());
+}
+
+FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_ItemManifest& Manifest)
+{
+	FSInv_SlotAvailabilityResult Result;
+	Result.TotalRoomToFill = 1;
+
+	FSInv_SlotAvailability SlotAvailability;
+	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.SlotIndex = 0;
+	
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability)); // Moves the struct Slot Availability into Result's SlotAvailability struct array
+	
+	return Result;
+}
+
+/*------------------------------------------*/
+/*			Adding Items to Grid			*/
+/*------------------------------------------*/
+
 // Called from InventoryComponent::AddNewItem OnItemAdded.Broadcast()
+
 void USInv_InventoryGrid::AddItem(USInv_InventoryItem* Item)
 {
 	if (!MatchesCategory(Item)) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("InventoryGrid::AddItem"));
+	FSInv_SlotAvailabilityResult Result = HasRoomForItem(Item);
+
+	AddItemToIndices(Result, Item);
+}
+
+void USInv_InventoryGrid::AddItemToIndices(const FSInv_SlotAvailabilityResult& Result, USInv_InventoryItem* NewItem)
+{
+	// Get Grid Fragment so we know how many grid spaces the item takes.
+	// Get Image Fragment, so we have the Icon to display.
+
+	// Create a Widget to add to the grid
+
+	// Store the new Widget in a container.
 }

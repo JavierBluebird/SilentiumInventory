@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Items/SInv_InventoryItem.h"
 #include "Types/SInv_GridTypes.h"
 #include "SInv_InventoryGrid.generated.h"
 
+struct FSInv_ItemManifest;
+class USInv_ItemComponent;
 class USInv_InventoryComponent;
 class UCanvasPanel;
 class USInv_GridSlot;
+class USInv_ItemManifest;
 /**
  * 
  */
@@ -23,6 +25,8 @@ public:
 	virtual void NativeOnInitialized() override;
 	ESInv_ItemCategory GetItemCategory() const { return ItemCategory; };
 
+	FSInv_SlotAvailabilityResult HasRoomForItem(const USInv_ItemComponent* ItemComponent);
+
 	UFUNCTION()
 	void AddItem(USInv_InventoryItem* Item);
 	
@@ -32,8 +36,16 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "Silentium Inventory")
 	ESInv_ItemCategory ItemCategory;
-
+	
 	void ConstructGrid();
+
+	// Overload with Inventory Item
+	FSInv_SlotAvailabilityResult HasRoomForItem(const USInv_InventoryItem* Item);
+
+	// Overload with Manifest
+	FSInv_SlotAvailabilityResult HasRoomForItem(const FSInv_ItemManifest& Manifest);
+
+	void AddItemToIndices(const FSInv_SlotAvailabilityResult& Result, USInv_InventoryItem* NewItem);
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;

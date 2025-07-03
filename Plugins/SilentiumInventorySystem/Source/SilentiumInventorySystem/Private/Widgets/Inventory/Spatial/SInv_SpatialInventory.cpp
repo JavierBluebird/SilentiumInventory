@@ -2,9 +2,13 @@
 
 
 #include "Widgets/Inventory/Spatial/SInv_SpatialInventory.h"
+
+#include "SilentiumInventorySystem.h"
 #include "Widgets/Inventory/Spatial/SInv_InventoryGrid.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "InventoryManagement/Utils/SInv_InventoryStatics.h"
+
 
 void USInv_SpatialInventory::NativeOnInitialized()
 {
@@ -22,10 +26,22 @@ void USInv_SpatialInventory::NativeOnInitialized()
 
 FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemComponent* ItemComponent) const
 {
-	FSInv_SlotAvailabilityResult Result;
-	Result.TotalRoomToFill = 1;
-	//return FSInv_SlotAvailabilityResult();
-	return Result;
+	switch (USInv_InventoryStatics::GetItemCategoryFromItemComp(ItemComponent))
+	{
+		case ESInv_ItemCategory::Equippable :
+			return Grid_Equippables->HasRoomForItem(ItemComponent);
+		
+		case ESInv_ItemCategory::Consumable :
+			return Grid_Consumables->HasRoomForItem(ItemComponent);
+
+		case ESInv_ItemCategory::Craftable :
+			return Grid_Craftables->HasRoomForItem(ItemComponent);
+
+		default:
+			 // This will be an error, hence we will log it in our custom Log Channel
+			UE_LOG(LogSilentiumInventory, Error, TEXT("SInv_SpatialInventory: ItemComponent doesn't have a valid Item Category "));
+			return FSInv_SlotAvailabilityResult();
+	}
 }
 
 
