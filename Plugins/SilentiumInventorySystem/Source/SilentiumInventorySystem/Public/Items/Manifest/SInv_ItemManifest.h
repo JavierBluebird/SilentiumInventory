@@ -28,6 +28,9 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	ESInv_ItemCategory GetItemCategory() const {return ItemCategory;}
 	// Item Type Getter
 	FGameplayTag GetItemType() const { return ItemType; }
+
+	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
+	const T* GetFragmentOfTypeWithTag(const FGameplayTag& FragmentTag) const;
 	
 private:
 
@@ -42,4 +45,18 @@ private:
 	
 };
 
-
+template<typename T>
+requires std::derived_from<T, FSInv_ItemFragment>
+const T* FSInv_ItemManifest::GetFragmentOfTypeWithTag(const FGameplayTag& FragmentTag) const
+{
+	for (const TInstancedStruct<FSInv_ItemFragment>& Fragment : Fragments)
+	{
+		if (const T* FragmentPtr = Fragment.GetPtr<T>())
+		{
+			// If the fragment doesnt match the tag, skips this index
+			if (!FragmentPtr->GetFragmentTag().MatchesTagExact(FragmentTag)) continue;
+			return FragmentPtr; // Returns detected valid Fragment const pointer
+		}
+	}
+	return nullptr;
+}

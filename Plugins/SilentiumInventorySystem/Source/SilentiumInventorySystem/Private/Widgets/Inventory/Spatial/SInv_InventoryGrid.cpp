@@ -11,6 +11,8 @@
 #include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
 #include "Items/SInv_InventoryItem.h"
 #include "Items/Components/SInv_ItemComponent.h"
+#include "Items/Fragments/SInv_FragmentTags.h"
+#include "Items/Fragments/SInv_ItemFragment.h"
 #include "Items/Manifest/SInv_ItemManifest.h"
 #include "Widgets/Utils/SInv_WidgetUtils.h"
 
@@ -105,9 +107,13 @@ void USInv_InventoryGrid::AddItem(USInv_InventoryItem* Item)
 void USInv_InventoryGrid::AddItemToIndices(const FSInv_SlotAvailabilityResult& Result, USInv_InventoryItem* NewItem)
 {
 	// Get Grid Fragment so we know how many grid spaces the item takes.
+	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(NewItem, FragmentTags::GridFragment);
+	
 	// Get Image Fragment, so we have the Icon to display.
+	const FSInv_ImageFragment* ImageFragment = GetFragment<FSInv_ImageFragment>(NewItem, FragmentTags::ImageFragment);
 
+	if (!GridFragment || !ImageFragment) return; // Both are necessary, return if not valid.
+	
 	// Create a Widget to add to the grid
-
 	// Store the new Widget in a container.
 }

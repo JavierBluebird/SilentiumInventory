@@ -32,3 +32,13 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"), Replicated)
 	FInstancedStruct ItemManifest;
 };
+
+template <typename FragmentType>
+const FragmentType* GetFragment(const USInv_InventoryItem* Item, const FGameplayTag& Tag)
+{
+	if (!IsValid(Item)) return nullptr;
+	
+	const FSInv_ItemManifest& Manifest = Item->GetItemManifest();
+	
+	return Manifest.GetFragmentOfTypeWithTag<FragmentType>(Tag);
+};
