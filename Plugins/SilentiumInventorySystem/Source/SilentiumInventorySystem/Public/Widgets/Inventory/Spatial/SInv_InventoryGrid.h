@@ -66,6 +66,8 @@ private:
 	void AddSlottedItemToCanvas(const int32 SlotIndex,
 		const FSInv_GridFragment* GridFragment,
 		USInv_SlottedItem* SlottedItem) const;
+
+	void UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex);
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;

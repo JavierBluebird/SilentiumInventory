@@ -110,8 +110,13 @@ void USInv_InventoryGrid::AddItemToIndices(const FSInv_SlotAvailabilityResult& R
 	for (const auto& Availability : Result.SlotAvailabilities)
 	{
 		AddItemAtIndex(NewItem,Availability.SlotIndex,Result.bStackable, Availability.AmountToFill);
+		UpdateGridSlots(NewItem,Availability.SlotIndex);
 	}
 }
+
+/*------------------------------------------*/
+/*			Creates Slotted Item			*/
+/*------------------------------------------*/
 void USInv_InventoryGrid::AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount)
 {
 	// Get Grid Fragment so we know how many grid spaces the item takes.
@@ -140,6 +145,9 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 	return SlottedItem;
 }
 
+/*------------------------------------------*/
+/*		Adds Slotted Item to Canvas			*/
+/*------------------------------------------*/
 void USInv_InventoryGrid::AddSlottedItemToCanvas(const int32 SlotIndex, const FSInv_GridFragment* GridFragment,
 	USInv_SlottedItem* SlottedItem) const
 {
@@ -153,9 +161,27 @@ void USInv_InventoryGrid::AddSlottedItemToCanvas(const int32 SlotIndex, const FS
 	CanvasSlot->SetPosition(DrawPosWithPadding);
 }
 
+void USInv_InventoryGrid::UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex)
+{
+	check(GridSlotsArray.IsValidIndex(SlotIndex)); // Safety Check
+
+	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(NewItem, FragmentTags::GridFragment);
+	if (!GridFragment) return;
+
+	// If we don't have a Grid Fragment, we assume it's 1x1 size.
+	const FIntPoint GridDimensions =  GridFragment ? GridFragment->GetGridSize() :FIntPoint(1,1);
+
+	USInv_InventoryStatics::ForEach2D(GridSlotsArray,SlotIndex,GridDimensions,Columns,
+	[](USInv_GridSlot* GridSlot)
+				{
+					GridSlot->SetOccupiedTexture();
+				}
+	);
+}
+
 void USInv_InventoryGrid::SetSlottedItemImage(const USInv_SlottedItem* SlottedItem,
-	const FSInv_GridFragment* GridFragment,
-	const FSInv_ImageFragment* ImageFragment) const
+                                              const FSInv_GridFragment* GridFragment,
+                                              const FSInv_ImageFragment* ImageFragment) const
 {
 	FSlateBrush Brush;
 	Brush.SetResourceObject(ImageFragment->GetItemIcon());
