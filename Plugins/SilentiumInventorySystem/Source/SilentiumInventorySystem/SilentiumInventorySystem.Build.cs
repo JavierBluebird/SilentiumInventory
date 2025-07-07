@@ -30,6 +30,7 @@ public class SilentiumInventorySystem : ModuleRules
 				"NetCore",
 				"StructUtils",
 				"GameplayTags",
+				"EnhancedInput"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -43,7 +44,8 @@ public class SilentiumInventorySystem : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UMG",
-				"EnhancedInput"
+				"EnhancedInput",
+				"StructUtils"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

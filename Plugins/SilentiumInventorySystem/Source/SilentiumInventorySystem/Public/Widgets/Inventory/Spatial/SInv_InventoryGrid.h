@@ -7,6 +7,10 @@
 #include "Types/SInv_GridTypes.h"
 #include "SInv_InventoryGrid.generated.h"
 
+
+struct FSInv_ImageFragment;
+struct FSInv_GridFragment;
+class USInv_SlottedItem;
 struct FSInv_ItemManifest;
 class USInv_ItemComponent;
 class USInv_InventoryComponent;
@@ -46,12 +50,27 @@ private:
 	FSInv_SlotAvailabilityResult HasRoomForItem(const FSInv_ItemManifest& Manifest);
 
 	void AddItemToIndices(const FSInv_SlotAvailabilityResult& Result, USInv_InventoryItem* NewItem);
+	bool MatchesCategory(const USInv_InventoryItem* Item) const;
 
+	FVector2D GetDrawSize(const FSInv_GridFragment* GridFragment) const;
+	void SetSlottedItemImage(const USInv_SlottedItem* SlottedItem, const FSInv_GridFragment* GridFragment, const FSInv_ImageFragment* ImageFragment) const;
+	void AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount) const;
+
+	USInv_SlottedItem* CreateSlottedItem(USInv_InventoryItem* Item,
+		const bool bStackable,
+		const int32 StackAmount,
+		const FSInv_GridFragment* GridFragment,
+		const FSInv_ImageFragment* ImageFragment,
+		const int32 Index ) const;
+	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TSubclassOf<USInv_SlottedItem> SlottedItemClass;
 	
 	UPROPERTY(meta = (BindWidget))
 	TArray<TObjectPtr<USInv_GridSlot>> GridSlotsArray;
@@ -65,6 +84,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	float SlotSize;
 
-	bool MatchesCategory(const USInv_InventoryItem* Item) const;
+
 	
 };
