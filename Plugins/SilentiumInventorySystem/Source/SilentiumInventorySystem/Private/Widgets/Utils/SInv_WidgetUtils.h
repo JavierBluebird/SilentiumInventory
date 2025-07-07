@@ -17,4 +17,5 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_WidgetUtils : public UBlueprintFunction
 public:
 
 	static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
+	static FIntPoint GetPositionFromIndex(const int32 SlotIndex, const int32 Columns);
 };

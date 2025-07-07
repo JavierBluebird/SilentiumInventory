@@ -54,7 +54,7 @@ private:
 
 	FVector2D GetDrawSize(const FSInv_GridFragment* GridFragment) const;
 	void SetSlottedItemImage(const USInv_SlottedItem* SlottedItem, const FSInv_GridFragment* GridFragment, const FSInv_ImageFragment* ImageFragment) const;
-	void AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount) const;
+	void AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount) ;
 
 	USInv_SlottedItem* CreateSlottedItem(USInv_InventoryItem* Item,
 		const bool bStackable,
@@ -62,6 +62,10 @@ private:
 		const FSInv_GridFragment* GridFragment,
 		const FSInv_ImageFragment* ImageFragment,
 		const int32 Index ) const;
+
+	void AddSlottedItemToCanvas(const int32 SlotIndex,
+		const FSInv_GridFragment* GridFragment,
+		USInv_SlottedItem* SlottedItem) const;
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;
@@ -71,6 +75,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_SlottedItem> SlottedItemClass;
+
+	UPROPERTY()
+	TMap<int32, TObjectPtr<USInv_SlottedItem>> SlottedItems;
 	
 	UPROPERTY(meta = (BindWidget))
 	TArray<TObjectPtr<USInv_GridSlot>> GridSlotsArray;

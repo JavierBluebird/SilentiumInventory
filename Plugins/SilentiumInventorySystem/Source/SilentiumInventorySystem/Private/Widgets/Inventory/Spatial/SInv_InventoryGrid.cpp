@@ -63,8 +63,6 @@ bool USInv_InventoryGrid::MatchesCategory(const USInv_InventoryItem* Item) const
 	return Item->GetItemManifest().GetItemCategory() == ItemCategory;
 }
 
-
-
 /*------------------------------------------*/
 /*		HasRoomForItem overloads			*/
 /*------------------------------------------*/
@@ -114,11 +112,10 @@ void USInv_InventoryGrid::AddItemToIndices(const FSInv_SlotAvailabilityResult& R
 		AddItemAtIndex(NewItem,Availability.SlotIndex,Result.bStackable, Availability.AmountToFill);
 	}
 }
-void USInv_InventoryGrid::AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount) const
+void USInv_InventoryGrid::AddItemAtIndex(USInv_InventoryItem* NewItem, const int32 Index, const bool bStackable, const int32 StackAmount)
 {
 	// Get Grid Fragment so we know how many grid spaces the item takes.
 	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(NewItem, FragmentTags::GridFragment);
-	
 	// Get Image Fragment, so we have the Icon to display.
 	const FSInv_ImageFragment* ImageFragment = GetFragment<FSInv_ImageFragment>(NewItem, FragmentTags::ImageFragment);
 
@@ -127,8 +124,9 @@ void USInv_InventoryGrid::AddItemAtIndex(USInv_InventoryItem* NewItem, const int
 	USInv_SlottedItem* SlottedItem = CreateSlottedItem(NewItem,bStackable,StackAmount,GridFragment,ImageFragment,Index); // Creates Slotted Item
 
 	// Add Slotted Item to the canvas panel.
-	
+	AddSlottedItemToCanvas(Index, GridFragment, SlottedItem);
 	// Store the new Widget in a container.
+	SlottedItems.Add(Index, SlottedItem);
 }
 
 USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* Item, const bool bStackable, const int32 StackAmount,
@@ -142,8 +140,22 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 	return SlottedItem;
 }
 
-void USInv_InventoryGrid::SetSlottedItemImage(const USInv_SlottedItem* SlottedItem, const FSInv_GridFragment* GridFragment,
-                                              const FSInv_ImageFragment* ImageFragment) const
+void USInv_InventoryGrid::AddSlottedItemToCanvas(const int32 SlotIndex, const FSInv_GridFragment* GridFragment,
+	USInv_SlottedItem* SlottedItem) const
+{
+	CanvasPanel->AddChild(SlottedItem);
+	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(SlottedItem);
+	CanvasSlot->SetSize(GetDrawSize(GridFragment));
+
+	const FVector2D DrawPos = USInv_WidgetUtils::GetPositionFromIndex(SlotIndex, Columns) * SlotSize;
+	const FVector2D DrawPosWithPadding = DrawPos + FVector2D(GridFragment->GetGridPadding());
+	
+	CanvasSlot->SetPosition(DrawPosWithPadding);
+}
+
+void USInv_InventoryGrid::SetSlottedItemImage(const USInv_SlottedItem* SlottedItem,
+	const FSInv_GridFragment* GridFragment,
+	const FSInv_ImageFragment* ImageFragment) const
 {
 	FSlateBrush Brush;
 	Brush.SetResourceObject(ImageFragment->GetItemIcon());
