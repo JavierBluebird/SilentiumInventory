@@ -28,3 +28,8 @@ void USInv_GridSlot::SetGrayedOutTexture()
 	GridSlotState = ESInv_GridSlotsState::GrayedOut;
 	Image_GridSlot->SetBrush(Brush_GrayedOut);
 }
+
+void USInv_GridSlot::SetInventoryItem(TWeakObjectPtr<USInv_InventoryItem> Item)
+{
+	InventoryItem = Item;
+}

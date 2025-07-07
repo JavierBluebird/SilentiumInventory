@@ -80,12 +80,21 @@ FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_Ite
 {
 	FSInv_SlotAvailabilityResult Result;
 	Result.TotalRoomToFill = 1;
+	Result.bStackable = true;
+	
 
 	FSInv_SlotAvailability SlotAvailability;
-	SlotAvailability.AmountToFill = 1;
+	SlotAvailability.AmountToFill = 2;
 	SlotAvailability.SlotIndex = 0;
-	
+
 	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability)); // Moves the struct Slot Availability into Result's SlotAvailability struct array
+
+	FSInv_SlotAvailability SlotAvailability2;
+	SlotAvailability2.AmountToFill = 5;
+	SlotAvailability2.SlotIndex = 1;
+
+	Result.SlotAvailabilities.Add(MoveTemp(SlotAvailability2)); // Moves the struct Slot Availability into Result's SlotAvailability struct array
+
 	
 	return Result;
 }
@@ -110,7 +119,7 @@ void USInv_InventoryGrid::AddItemToIndices(const FSInv_SlotAvailabilityResult& R
 	for (const auto& Availability : Result.SlotAvailabilities)
 	{
 		AddItemAtIndex(NewItem,Availability.SlotIndex,Result.bStackable, Availability.AmountToFill);
-		UpdateGridSlots(NewItem,Availability.SlotIndex);
+		UpdateGridSlots(NewItem,Availability.SlotIndex,Result.bStackable, Availability.AmountToFill);
 	}
 }
 
@@ -141,6 +150,11 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 	SlottedItem->SetInventoryItem(Item);
 	SetSlottedItemImage(SlottedItem,GridFragment,ImageFragment);
 	SlottedItem->SetGridIndex(Index);
+
+	// Stackable Settings
+	SlottedItem->SetIsStackable(bStackable);
+	const int32 StackUpdateAmount = bStackable ? StackAmount : 0;
+	SlottedItem->UpdateStackCount(StackUpdateAmount);
 	
 	return SlottedItem;
 }
@@ -161,20 +175,29 @@ void USInv_InventoryGrid::AddSlottedItemToCanvas(const int32 SlotIndex, const FS
 	CanvasSlot->SetPosition(DrawPosWithPadding);
 }
 
-void USInv_InventoryGrid::UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex)
+void USInv_InventoryGrid::UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex, bool bStackableItem, const int32 StackAmount)
 {
 	check(GridSlotsArray.IsValidIndex(SlotIndex)); // Safety Check
 
+	if (bStackableItem)
+	{
+		GridSlotsArray[SlotIndex]->SetStackCount(StackAmount); // Will be Upper Left Index
+	}
+	
+	
 	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(NewItem, FragmentTags::GridFragment);
 	if (!GridFragment) return;
 
 	// If we don't have a Grid Fragment, we assume it's 1x1 size.
-	const FIntPoint GridDimensions =  GridFragment ? GridFragment->GetGridSize() :FIntPoint(1,1);
+	const FIntPoint GridDimensions =  GridFragment ? GridFragment->GetGridSize() : FIntPoint(1,1);
 
 	USInv_InventoryStatics::ForEach2D(GridSlotsArray,SlotIndex,GridDimensions,Columns,
-	[](USInv_GridSlot* GridSlot)
+	[&](USInv_GridSlot* GridSlot)
 				{
+					GridSlot->SetInventoryItem(NewItem);
+					GridSlot->SetUpperLeftSlotIndex(SlotIndex);
 					GridSlot->SetOccupiedTexture();
+					GridSlot->SetAvailable(false);
 				}
 	);
 }

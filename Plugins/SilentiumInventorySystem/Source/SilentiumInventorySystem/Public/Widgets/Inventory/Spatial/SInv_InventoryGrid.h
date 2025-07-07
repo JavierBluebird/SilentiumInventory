@@ -67,7 +67,7 @@ private:
 		const FSInv_GridFragment* GridFragment,
 		USInv_SlottedItem* SlottedItem) const;
 
-	void UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex);
+	void UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex, bool bStackableItem, const int32 StackAmount);
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;

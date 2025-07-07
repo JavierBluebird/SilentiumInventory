@@ -80,7 +80,7 @@ struct FSInv_GridFragment : public FSInv_ItemFragment
 	void SetGridPadding(float Padding) { GridPadding = Padding; }
 	
 	private:
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Amount of Slots this Item will take on Inventory Grid"))
 	FIntPoint GridSize {1,1};
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
@@ -107,4 +107,24 @@ struct FSInv_ImageFragment : public FSInv_ItemFragment
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	FVector2D IconDimensions {44.f , 44.f};
+};
+
+/*------------------------------------------------*/
+/*				Stackable Fragment			 	  */
+/*------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_StackableFragment : public FSInv_ItemFragment
+{
+	GENERATED_BODY()
+
+	int32 GetMaxStackSize() const { return MaxStackSize; }
+	int32 GetStackCount() const { return StackCount; }
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Max amount of items the Stack can hold per Slot."))
+	int32 MaxStackSize {1};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Amount of items we will get on the Stack when Item gets picked up."))
+	int32 StackCount {1};
 };
