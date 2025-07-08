@@ -31,6 +31,9 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 
 	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
 	const T* GetFragmentOfTypeWithTag(const FGameplayTag& FragmentTag) const;
+
+	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
+	const T* GetFragmentOfType() const;
 	
 private:
 
@@ -45,6 +48,9 @@ private:
 	
 };
 
+/*--------------------------------------------*/
+/*	Fragment Type Searching with Tag Checking */
+/*--------------------------------------------*/
 template<typename T>
 requires std::derived_from<T, FSInv_ItemFragment>
 const T* FSInv_ItemManifest::GetFragmentOfTypeWithTag(const FGameplayTag& FragmentTag) const
@@ -55,6 +61,22 @@ const T* FSInv_ItemManifest::GetFragmentOfTypeWithTag(const FGameplayTag& Fragme
 		{
 			// If the fragment doesnt match the tag, skips this index
 			if (!FragmentPtr->GetFragmentTag().MatchesTagExact(FragmentTag)) continue;
+			return FragmentPtr; // Returns detected valid Fragment const pointer
+		}
+	}
+	return nullptr;
+}
+/*-----------------------------------------------*/
+/*	Fragment Type Searching without Tag Checking */
+/*-----------------------------------------------*/
+template<typename T>
+requires std::derived_from<T, FSInv_ItemFragment>
+const T* FSInv_ItemManifest::GetFragmentOfType() const
+{
+	for (const TInstancedStruct<FSInv_ItemFragment>& Fragment : Fragments)
+	{
+		if (const T* FragmentPtr = Fragment.GetPtr<T>())
+		{
 			return FragmentPtr; // Returns detected valid Fragment const pointer
 		}
 	}
