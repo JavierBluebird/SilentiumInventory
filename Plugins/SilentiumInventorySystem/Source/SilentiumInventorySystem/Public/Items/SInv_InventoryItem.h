@@ -27,6 +27,8 @@ public:
 
 	// Mutable Reference Getter
 	FSInv_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FSInv_ItemManifest>(); }
+
+	bool IsStackable() const;
 	
 private:
 	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"), Replicated)

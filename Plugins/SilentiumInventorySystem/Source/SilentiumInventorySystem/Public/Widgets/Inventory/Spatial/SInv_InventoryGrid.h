@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Types/SInv_GridTypes.h"
 #include "SInv_InventoryGrid.generated.h"
@@ -68,16 +69,28 @@ private:
 		USInv_SlottedItem* SlottedItem) const;
 
 	void UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex, bool bStackableItem, const int32 StackAmount);
-	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index);
+	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
 
 	// Function to check Spatial Grid on Item Adding and Has Room checking.
 	bool HasRoomAtIndex(const USInv_GridSlot* GridSlot,
 		const FIntPoint& ItemDimensions,
 		const TSet<int32>& CheckedIndices,
-		TSet<int32>& OutTentativelyClaimed);
+		TSet<int32>& OutTentativelyClaimed,
+		const FGameplayTag& ItemType);
 	
-	bool CheckSlotConstraints(const USInv_GridSlot* SubGridSlot) const;
+	bool CheckSlotConstraints(const USInv_GridSlot* GridSlot,
+							  const USInv_GridSlot* SubGridSlot, 
+							  const TSet<int32>& CheckedIndices,
+							  TSet<int32>& OutTentativelyClaimedIndices,
+							  const FGameplayTag& ItemType) const;
+
+	bool IsUpperLeftSlot(const USInv_GridSlot* GridSlot,const USInv_GridSlot* SubGridSlot) const;
+
+	bool DoesItemTypeMatch(const USInv_InventoryItem* SubItem ,const FGameplayTag& ItemType) const;
+	
 	FIntPoint GetItemDimensions(const FSInv_ItemManifest& ItemManifest) const;
+
+	bool HasValidItem(const USInv_GridSlot* GridSlot) const;
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;

@@ -101,7 +101,11 @@ FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_Ite
 		
 		// Can the item fit here? (Grid Dimensions, out of grid bounds?)
 		TSet<int32> TentativelyClaimed;
-		if (!HasRoomAtIndex(GridSlot, GetItemDimensions(Manifest), CheckedIndices, TentativelyClaimed))
+		if (!HasRoomAtIndex(GridSlot,
+							GetItemDimensions(Manifest),
+							CheckedIndices,
+							TentativelyClaimed,
+							Manifest.GetItemType()))
 		{
 			continue; // If there's no room there, skip.
 		}
@@ -115,7 +119,7 @@ FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_Ite
 	return Result;
 }
 
-bool USInv_InventoryGrid::IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index)
+bool USInv_InventoryGrid::IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const
 {
 	return CheckedIndices.Contains(Index);	
 }
@@ -129,9 +133,10 @@ FIntPoint USInv_InventoryGrid::GetItemDimensions(const FSInv_ItemManifest& ItemM
 }
 
 bool USInv_InventoryGrid::HasRoomAtIndex(const USInv_GridSlot* GridSlot,
-										const FIntPoint& ItemDimensions,
-										const TSet<int32>& CheckedIndices,
-										TSet<int32>& OutTentativelyClaimed)
+                                         const FIntPoint& ItemDimensions,
+                                         const TSet<int32>& CheckedIndices,
+                                         TSet<int32>& OutTentativelyClaimed,
+                                         const FGameplayTag& ItemType)
 {
 	// Is there room at this index? (i.e. are the other items in the way?)
 	bool bHasRoomAtIndex {true};
@@ -140,9 +145,9 @@ bool USInv_InventoryGrid::HasRoomAtIndex(const USInv_GridSlot* GridSlot,
 	USInv_InventoryStatics::ForEach2D(GridSlotsArray,GridSlot->GetSlotIndex(),ItemDimensions,Columns,
 		[&](const USInv_GridSlot* SubGridSlot)
 			{
-				if (CheckSlotConstraints(SubGridSlot))
+				if (CheckSlotConstraints(GridSlot,SubGridSlot,CheckedIndices, OutTentativelyClaimed, ItemType))
 				{
-					OutTentativelyClaimed.Add(SubGridSlot->GetIndex());
+					OutTentativelyClaimed.Add(SubGridSlot->GetIndex()); // This is being added in CheckslotConstraints..must remove
 				}
 				else
 				{
@@ -153,16 +158,53 @@ bool USInv_InventoryGrid::HasRoomAtIndex(const USInv_GridSlot* GridSlot,
 	return bHasRoomAtIndex;
 }
 
-bool USInv_InventoryGrid::CheckSlotConstraints(const USInv_GridSlot* SubGridSlot) const
+bool USInv_InventoryGrid::CheckSlotConstraints(
+						  const USInv_GridSlot* GridSlot,
+						  const USInv_GridSlot* SubGridSlot,
+						  const TSet<int32>& CheckedIndices,
+						  TSet<int32>& OutTentativelyClaimed,
+						  const FGameplayTag& ItemType) const
 {
-	// Check any other important conditions - ForEach2D over a 2D Range
-		// Index claimed?
-		// Has valid item?
-		// Is this Item the same type as the item we're trying to add?
-		// If so, is this a stackable item?
-		// If stackable, is this slot at the Max Stack Size already?
+	// Index claimed?
+	if (IsIndexClaimed(CheckedIndices,SubGridSlot->GetIndex())) return false;
+	
+	// Has valid item? If not, this index might fit our needs.
+	if (!HasValidItem(SubGridSlot))
+	{
+		OutTentativelyClaimed.Add(SubGridSlot->GetIndex());
+		return true;
+	}
+
+	// Is this Grid Slot an Upper left slot?
+	if (!IsUpperLeftSlot(GridSlot,SubGridSlot)) return false;
+	
+	// If so, is this a stackable item?
+	const USInv_InventoryItem* SubItem = SubGridSlot->GetInventoryItem().Get();
+	if (!SubItem->IsStackable()) return false;
+	
+	// Is this Item the same type as the item we're trying to add?
+	if (!DoesItemTypeMatch(SubItem,ItemType)) return false;
+	
+	// If stackable, is this slot at the Max Stack Size already?
+	
 	return false;
 }
+
+bool USInv_InventoryGrid::IsUpperLeftSlot(const USInv_GridSlot* GridSlot, const USInv_GridSlot* SubGridSlot) const
+{
+	return SubGridSlot->GetUpperLeftSlotIndex() == GridSlot->GetIndex();
+}
+
+bool USInv_InventoryGrid::DoesItemTypeMatch(const USInv_InventoryItem* SubItem, const FGameplayTag& ItemType) const
+{
+	return SubItem->GetItemManifest().GetItemType().MatchesTagExact(ItemType);
+}
+
+bool USInv_InventoryGrid::HasValidItem(const USInv_GridSlot* GridSlot) const
+{
+	return GridSlot->GetInventoryItem().IsValid(); // Need .IsValid as it's a WeakObjectPtr
+}
+
 
 /*------------------------------------------*/
 /*			Adding Items to Grid			*/
