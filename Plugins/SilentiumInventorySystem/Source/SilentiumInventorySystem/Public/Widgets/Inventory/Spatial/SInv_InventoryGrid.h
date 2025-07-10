@@ -76,13 +76,15 @@ private:
 		const FIntPoint& ItemDimensions,
 		const TSet<int32>& CheckedIndices,
 		TSet<int32>& OutTentativelyClaimed,
-		const FGameplayTag& ItemType);
+		const FGameplayTag& ItemType,
+		const int32 MaxStackSize);
 	
 	bool CheckSlotConstraints(const USInv_GridSlot* GridSlot,
 							  const USInv_GridSlot* SubGridSlot, 
 							  const TSet<int32>& CheckedIndices,
 							  TSet<int32>& OutTentativelyClaimedIndices,
-							  const FGameplayTag& ItemType) const;
+							  const FGameplayTag& ItemType,
+							  const int32 MaxStackSize) const;
 
 	bool IsUpperLeftSlot(const USInv_GridSlot* GridSlot,const USInv_GridSlot* SubGridSlot) const;
 
