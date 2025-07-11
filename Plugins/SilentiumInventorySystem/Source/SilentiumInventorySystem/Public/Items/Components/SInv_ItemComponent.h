@@ -21,7 +21,12 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	FSInv_ItemManifest GetItemManifest() const {return ItemManifest;};
-	
+
+	void PickedUp();
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category="Silentium Inventory")
+	void OnPickedUp();
 private:
 
 	UPROPERTY(EditAnywhere,Category="Silentium Inventory", Replicated)

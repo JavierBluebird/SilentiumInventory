@@ -29,10 +29,16 @@ public:
 	FSInv_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FSInv_ItemManifest>(); }
 
 	bool IsStackable() const;
-	
+
+	int32 GetTotalStackCount() const { return TotalStackCount; };
+	void SetTotalStackCount(const int32 StackCount) { TotalStackCount = StackCount; };
+
 private:
 	UPROPERTY(VisibleAnywhere, meta = (BaseStruct = "/Script/SilentiumInventorySystem.SInv_Manifest"), Replicated)
 	FInstancedStruct ItemManifest;
+	
+	UPROPERTY(Replicated)
+	int32 TotalStackCount {0};
 };
 
 template <typename FragmentType>

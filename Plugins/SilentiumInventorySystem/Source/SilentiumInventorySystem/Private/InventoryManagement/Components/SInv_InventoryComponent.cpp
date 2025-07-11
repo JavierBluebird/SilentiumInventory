@@ -6,6 +6,7 @@
 #include "Items/Components/SInv_ItemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Items/SInv_InventoryItem.h"
+#include "Items/Fragments/SInv_ItemFragment.h"
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 
 USInv_InventoryComponent::USInv_InventoryComponent() : InventoryList(this)
@@ -107,6 +108,8 @@ void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 	{
 		// Add Stacks to an Item that already exists in the Inventory. We only want to update the stack count,
 		// not create a new Item of this type.
+		
+		OnStackChange.Broadcast(Result);
 		Server_AddStacksToItem(ItemComponent,Result.TotalRoomToFill, Result.Remainder);
 	}
 	else if (Result.TotalRoomToFill > 0) 
@@ -121,18 +124,35 @@ void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount)
 {
 	USInv_InventoryItem* NewItem = InventoryList.AddItemEntry(ItemComponent); // Adds the item to Inventory Array
+	NewItem->SetTotalStackCount(StackCount);
+	
 	if (GetOwner()->GetNetMode() == NM_ListenServer ||
 		GetOwner()->GetNetMode() == NM_Standalone)
 	{
 		OnItemAdded.Broadcast(NewItem); // Instant broadcast since we are the Server, not the Client. 
 	}
-	// @TODO: Tell the Item Component to Destroy its owning actor
+	ItemComponent->PickedUp();
 }
 
 void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemComponent* ItemComponent,
 	int32 StackCount, int32 Remainder)
 {
-	
+	const FGameplayTag& ItemType = IsValid(ItemComponent) ? ItemComponent->GetItemManifest().GetItemType() : FGameplayTag::EmptyTag;
+	USInv_InventoryItem* Item = InventoryList.FindFirstItemByType(ItemType);
+	if (!IsValid(Item)) return;
+
+	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
+
+	//Destroy the item if the Remainder is zero.
+	if (Remainder == 0)
+	{
+		ItemComponent->PickedUp();
+	}
+	// Otherwise, update the stack count for the item pickup.
+	else if (FSInv_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FSInv_StackableFragment>())
+	{
+		StackableFragment->SetStackCount(Remainder);
+	}
 }
 
 void USInv_InventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

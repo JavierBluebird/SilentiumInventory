@@ -27,6 +27,7 @@ void USInv_InventoryGrid::NativeOnInitialized()
 						GetInventoryComponent(GetOwningPlayer());
 
 	InventoryComponent->OnItemAdded.AddDynamic(this,&ThisClass::AddItem);
+	InventoryComponent->OnStackChange.AddDynamic(this,&ThisClass::AddStacks);
 }
 
 void USInv_InventoryGrid::ConstructGrid()
@@ -344,6 +345,30 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 	SlottedItem->UpdateStackCount(StackUpdateAmount);
 	
 	return SlottedItem;
+}
+
+/*--------------------------------------------------*/
+/*		Adds Stacks on StackChange Delegate			*/
+/*--------------------------------------------------*/
+void USInv_InventoryGrid::AddStacks(const FSInv_SlotAvailabilityResult& Result)
+{
+	if (!MatchesCategory(Result.Item.Get())) return;
+
+	for (const auto& Availability : Result.SlotAvailabilities)
+	{
+		if (Availability.bItemAtIndex) // We need to make sure there's an item there to add the stacks to.
+		{
+			const auto& GridSlot = GridSlotsArray[Availability.SlotIndex];
+			const auto& SlottedItem = SlottedItems.FindChecked(Availability.SlotIndex);
+			SlottedItem->UpdateStackCount(GridSlot->GetStackCount() + Availability.AmountToFill);
+			GridSlot->SetStackCount(GridSlot->GetStackCount() + Availability.AmountToFill);
+		}
+		else
+		{
+			AddItemAtIndex(Result.Item.Get(),Availability.SlotIndex,Result.bStackable,Availability.AmountToFill);
+			UpdateGridSlots(Result.Item.Get(),Availability.SlotIndex,Result.bStackable, Availability.AmountToFill);
+		}
+	}
 }
 
 /*------------------------------------------*/

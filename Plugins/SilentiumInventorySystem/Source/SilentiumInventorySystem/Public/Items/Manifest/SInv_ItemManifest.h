@@ -34,6 +34,9 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 
 	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
 	const T* GetFragmentOfType() const;
+
+	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
+	T* GetFragmentOfTypeMutable();
 	
 private:
 
@@ -78,6 +81,20 @@ const T* FSInv_ItemManifest::GetFragmentOfType() const
 		if (const T* FragmentPtr = Fragment.GetPtr<T>())
 		{
 			return FragmentPtr; // Returns detected valid Fragment const pointer
+		}
+	}
+	return nullptr;
+}
+
+template <typename T>
+requires std::derived_from<T, FSInv_ItemFragment>
+T* FSInv_ItemManifest::GetFragmentOfTypeMutable()
+{
+	for (TInstancedStruct<FSInv_ItemFragment>& Fragment : Fragments)
+	{
+		if (T* FragmentPtr = Fragment.GetMutablePtr<T>())
+		{
+			return FragmentPtr; // Returns detected valid Fragment mutable pointer
 		}
 	}
 	return nullptr;

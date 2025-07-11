@@ -111,6 +111,9 @@ private:
 
 	bool HasValidItem(const USInv_GridSlot* GridSlot) const;
 
+	UFUNCTION()
+	void AddStacks(const FSInv_SlotAvailabilityResult& Result);
+
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -140,7 +143,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	float SlotSize;
-
-
 	
 };
+
+

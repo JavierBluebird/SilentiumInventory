@@ -8,6 +8,7 @@
 #include "SInv_InventoryComponent.generated.h"
 
 
+struct FSInv_SlotAvailabilityResult;
 class USInv_ItemComponent;
 class USInv_InventoryItem;
 class USInv_InventoryBase;
@@ -15,6 +16,7 @@ class USInv_InventoryBase;
 // Delegate of Item Added or Removed on FastArray.cpp
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChanged, USInv_InventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSInv_SlotAvailabilityResult&, Result);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorComponent
@@ -38,9 +40,13 @@ public:
 	
 	void ToggleInventoryMenu();
 	
+	/*-------------------------------*/
+	/*		Inventory Delegates		 */
+	/*-------------------------------*/
 	FInventoryItemChanged OnItemAdded;
 	FInventoryItemChanged OnItemRemoved;
 	FNoRoomInInventory NoRoomInInventory;
+	FStackChange OnStackChange;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -70,6 +76,4 @@ private:
 	bool bInventoryMenuOpen;
 	void OpenInventoryMenu();
 	void CloseInventoryMenu();
-
-
 };
