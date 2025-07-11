@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Types/SInv_GridTypes.h"
+#include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
 #include "SInv_InventoryGrid.generated.h"
 
 
@@ -69,8 +70,13 @@ private:
 		USInv_SlottedItem* SlottedItem) const;
 
 	void UpdateGridSlots(USInv_InventoryItem* NewItem, const int32 SlotIndex, bool bStackableItem, const int32 StackAmount);
-	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
 
+	/*---------------------------------------------------*/
+	/*													 */
+	/*	  Item Adding Checker & Utility Functions		 */
+	/*													 */
+	/*---------------------------------------------------*/
+	
 	// Function to check Spatial Grid on Item Adding and Has Room checking.
 	bool HasRoomAtIndex(const USInv_GridSlot* GridSlot,
 		const FIntPoint& ItemDimensions,
@@ -86,15 +92,30 @@ private:
 							  const FGameplayTag& ItemType,
 							  const int32 MaxStackSize) const;
 
+	bool IsIndexClaimed(const TSet<int32>& CheckedIndices, const int32 Index) const;
+	
 	bool IsUpperLeftSlot(const USInv_GridSlot* GridSlot,const USInv_GridSlot* SubGridSlot) const;
 
 	bool DoesItemTypeMatch(const USInv_InventoryItem* SubItem ,const FGameplayTag& ItemType) const;
 
 	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimensions) const;
+
+	int32 DetermineFillAmountForSlot(const bool bStackable,
+									 const int32 MaxStackSize,
+									 const int32 AmountToFill,
+									 const USInv_GridSlot* GridSlot) const;
+
+	int32 GetStackAmount(const USInv_GridSlot* GridSlot) const;
 	
 	FIntPoint GetItemDimensions(const FSInv_ItemManifest& ItemManifest) const;
 
 	bool HasValidItem(const USInv_GridSlot* GridSlot) const;
+
+	/*---------------------------------------------------*/
+	/*													 */
+	/*			Member Variables Section				 */
+	/*													 */
+	/*---------------------------------------------------*/
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_GridSlot> GridSlotClass;

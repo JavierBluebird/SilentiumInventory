@@ -121,12 +121,32 @@ FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_Ite
 		{
 			continue; // If there's no room there, skip.
 		}
+		// How much to fill?
+		const int32 AmountToFillInSlot = DetermineFillAmountForSlot(Result.bStackable,
+																	MaxStackSize,
+																	AmountToFill,
+																	GridSlot);
+		if (AmountToFillInSlot == 0) continue;
+		
 		CheckedIndices.Append(TentativelyClaimed);
 		
-		// How much to fill?
 		// Update the amount left to fill
+		Result.TotalRoomToFill += AmountToFillInSlot;
+		Result.SlotAvailabilities.Emplace(
+			FSInv_SlotAvailability
+			{
+				HasValidItem(GridSlot) ? GridSlot->GetUpperLeftSlotIndex() : GridSlot->GetIndex(),
+				Result.bStackable ? AmountToFillInSlot : 0,
+				HasValidItem(GridSlot)
+			}
+		);
+		AmountToFill -= AmountToFillInSlot;
+		
+		// How much is the remainder?
+		Result.Remainder = AmountToFill;
+		
+		if (AmountToFill == 0) return Result;
 	}
-	// How much is the remainder?
 	
 	return Result;
 }
@@ -233,6 +253,31 @@ bool USInv_InventoryGrid::IsInGridBounds(const int32 StartIndex, const FIntPoint
 	const int32 EndColumn = (StartIndex % Columns) + ItemDimensions.X;
 	const int32 EndRow = (StartIndex / Columns) + ItemDimensions.Y;
 	return EndColumn <= Columns && EndRow <= Rows;
+}
+
+int32 USInv_InventoryGrid::DetermineFillAmountForSlot(const bool bStackable, const int32 MaxStackSize,
+	const int32 AmountToFill, const USInv_GridSlot* GridSlot) const
+{
+	// Calculate Room in the Slot
+	const int32 RoomInSlot = MaxStackSize - GetStackAmount(GridSlot);
+	
+	// if stackable, we need the minimum between AmountToFill and RoomInSlot
+	return bStackable ? FMath::Min(AmountToFill, RoomInSlot) : 1;
+}
+
+int32 USInv_InventoryGrid::GetStackAmount(const USInv_GridSlot* GridSlot) const
+{
+	int32 CurrentSlotStackCount = GridSlot->GetStackCount();
+	
+	// If we are at a slot that doesn't hold the stack count, we must get the actual stack count.
+	// that means it's not the upper left slot.
+	if (const int32 UpperLeftSlotIndex = GridSlot->GetUpperLeftSlotIndex();
+		UpperLeftSlotIndex != INDEX_NONE)
+	{
+		USInv_GridSlot* UpperLeftGridSlot = GridSlotsArray[UpperLeftSlotIndex];
+		CurrentSlotStackCount = UpperLeftGridSlot->GetStackCount();
+	}
+	return CurrentSlotStackCount;
 }
 
 bool USInv_InventoryGrid::HasValidItem(const USInv_GridSlot* GridSlot) const
