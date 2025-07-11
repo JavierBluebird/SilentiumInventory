@@ -102,6 +102,13 @@ FSInv_SlotAvailabilityResult USInv_InventoryGrid::HasRoomForItem(const FSInv_Ite
 		
 		// Is this Index claimed yet?
 		if (IsIndexClaimed(CheckedIndices,GridSlot->GetIndex())) continue;
+
+		// Is Item in Grid Bounds?
+		if (!IsInGridBounds(GridSlot->GetSlotIndex(), GetItemDimensions(Manifest))) continue;
+		
+		/*-------------------------------------*/
+		/*		Main Grid Check Section		  */
+		/*------------------------------------*/
 		
 		// Can the item fit here? (Grid Dimensions, out of grid bounds?)
 		TSet<int32> TentativelyClaimed;
@@ -216,6 +223,16 @@ bool USInv_InventoryGrid::IsUpperLeftSlot(const USInv_GridSlot* GridSlot, const 
 bool USInv_InventoryGrid::DoesItemTypeMatch(const USInv_InventoryItem* SubItem, const FGameplayTag& ItemType) const
 {
 	return SubItem->GetItemManifest().GetItemType().MatchesTagExact(ItemType);
+}
+
+bool USInv_InventoryGrid::IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimensions) const
+{
+	// First check if we are out of bounds
+	if (StartIndex < 0 || StartIndex >= GridSlotsArray.Num()) return false;
+	
+	const int32 EndColumn = (StartIndex % Columns) + ItemDimensions.X;
+	const int32 EndRow = (StartIndex / Columns) + ItemDimensions.Y;
+	return EndColumn <= Columns && EndRow <= Rows;
 }
 
 bool USInv_InventoryGrid::HasValidItem(const USInv_GridSlot* GridSlot) const

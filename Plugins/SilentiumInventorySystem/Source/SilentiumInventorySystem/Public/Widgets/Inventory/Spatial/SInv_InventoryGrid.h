@@ -89,6 +89,8 @@ private:
 	bool IsUpperLeftSlot(const USInv_GridSlot* GridSlot,const USInv_GridSlot* SubGridSlot) const;
 
 	bool DoesItemTypeMatch(const USInv_InventoryItem* SubItem ,const FGameplayTag& ItemType) const;
+
+	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& ItemDimensions) const;
 	
 	FIntPoint GetItemDimensions(const FSInv_ItemManifest& ItemManifest) const;
 
