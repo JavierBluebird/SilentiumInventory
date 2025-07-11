@@ -37,7 +37,7 @@ struct FSInv_SlotAvailabilityResult
 
 	FSInv_SlotAvailabilityResult() {}
 
-	TWeakPtr<USInv_InventoryItem> Item;
+	TWeakObjectPtr<USInv_InventoryItem> Item;
 
 	bool bStackable{false};
 	int32 TotalRoomToFill{0};

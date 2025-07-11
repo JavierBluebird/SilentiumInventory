@@ -9,6 +9,7 @@
 class USInv_ItemComponent;
 class USInv_InventoryComponent;
 class USInv_InventoryItem;
+struct FGameplayTag;
 
 /*---------------------------------------------*/
 /*											   */
@@ -75,6 +76,8 @@ struct FSInv_InventoryFastArray : public FFastArraySerializer
 		USInv_InventoryItem* AddItemEntry(USInv_InventoryItem* Item); // overload
 
 		void RemoveItemEntry(USInv_InventoryItem* Item);
+	
+		USInv_InventoryItem* FindFirstItemByType(const FGameplayTag& ItemType) const;
 		
 	private:
 

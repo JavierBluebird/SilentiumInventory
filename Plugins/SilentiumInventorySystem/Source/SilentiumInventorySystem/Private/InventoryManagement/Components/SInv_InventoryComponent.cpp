@@ -3,7 +3,9 @@
 
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
 
+#include "Items/Components/SInv_ItemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Items/SInv_InventoryItem.h"
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 
 USInv_InventoryComponent::USInv_InventoryComponent() : InventoryList(this)
@@ -89,6 +91,10 @@ void USInv_InventoryComponent::CloseInventoryMenu()
 void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 {
 	FSInv_SlotAvailabilityResult Result = InventoryMenuReference->HasRoomForItem(ItemComponent);
+
+	// Checks item type and fills RESULT with it
+	USInv_InventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());
+	Result.Item = FoundItem;
 
 	// Zero value will be taken as No Room for this Item in Inventory.
 	if (Result.TotalRoomToFill == 0)
