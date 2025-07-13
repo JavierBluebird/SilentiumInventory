@@ -10,6 +10,7 @@
 #include "SInv_InventoryGrid.generated.h"
 
 
+class USInv_HoverItem;
 struct FSInv_ImageFragment;
 struct FSInv_GridFragment;
 class USInv_SlottedItem;
@@ -114,6 +115,19 @@ private:
 	UFUNCTION()
 	void AddStacks(const FSInv_SlotAvailabilityResult& Result);
 
+	UFUNCTION()
+	void OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent);
+
+	/*----------------------------------*/
+	/*		Hover Item Mouse Events		*/
+	/*----------------------------------*/
+	
+	bool IsRightClick(const FPointerEvent& MouseEvent) const;
+	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
+	void PickUp(USInv_InventoryItem* ClickedInventoryItem, const int32 GridIndex);
+	void AssignHoverItem(USInv_InventoryItem* InventoryItem);
+
+	
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -143,6 +157,12 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	float SlotSize;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TSubclassOf<USInv_HoverItem> HoverItemClass;
+
+	UPROPERTY()
+	TObjectPtr<USInv_HoverItem> HoverItem;
 	
 };
 

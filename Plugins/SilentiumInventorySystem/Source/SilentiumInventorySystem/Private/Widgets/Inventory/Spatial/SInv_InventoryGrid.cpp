@@ -14,6 +14,7 @@
 #include "Items/Fragments/SInv_FragmentTags.h"
 #include "Items/Fragments/SInv_ItemFragment.h"
 #include "Items/Manifest/SInv_ItemManifest.h"
+#include "Widgets/Inventory/HoverItem/SInv_HoverItem.h"
 #include "Widgets/Inventory/SlottedItems/SInv_SlottedItem.h"
 #include "Widgets/Utils/SInv_WidgetUtils.h"
 
@@ -343,8 +344,65 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 	SlottedItem->SetIsStackable(bStackable);
 	const int32 StackUpdateAmount = bStackable ? StackAmount : 0;
 	SlottedItem->UpdateStackCount(StackUpdateAmount);
+	SlottedItem->OnSlottedItemClicked.AddDynamic(this,&ThisClass::OnSlottedItemClicked);
 	
 	return SlottedItem;
+}
+
+void USInv_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	check(GridSlotsArray.IsValidIndex(GridIndex));
+	USInv_InventoryItem* ClickedInventoryItem = GridSlotsArray[GridIndex]->GetInventoryItem().Get();
+
+	if (!IsValid(HoverItem) && IsLeftClick(MouseEvent))
+	{
+		PickUp(ClickedInventoryItem,GridIndex);
+	}
+}
+
+bool USInv_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const
+{
+	return MouseEvent.GetEffectingButton() == EKeys::RightMouseButton;
+}
+
+bool USInv_InventoryGrid::IsLeftClick(const FPointerEvent& MouseEvent) const
+{
+	return MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton;
+}
+
+void USInv_InventoryGrid::PickUp(USInv_InventoryItem* ClickedInventoryItem, const int32 GridIndex)
+{
+	// Assign the Hover Item
+	AssignHoverItem(ClickedInventoryItem);
+	
+	// Remove the clicked item from the grid.
+	
+}
+
+void USInv_InventoryGrid::AssignHoverItem(USInv_InventoryItem* InventoryItem)
+{
+	if (!IsValid(HoverItem))
+	{
+		HoverItem = CreateWidget<USInv_HoverItem>(GetOwningPlayer(), HoverItemClass);
+	}
+	
+	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(InventoryItem, FragmentTags::GridFragment);
+	const FSInv_ImageFragment* ImageFragment = GetFragment<FSInv_ImageFragment>(InventoryItem, FragmentTags::ImageFragment);
+	if (!GridFragment || !ImageFragment) return;
+
+	const FVector2D DrawSize = GetDrawSize(GridFragment);
+
+	FSlateBrush IconBrush;
+	IconBrush.SetResourceObject(ImageFragment->GetItemIcon());
+	IconBrush.DrawAs = ESlateBrushDrawType::Image;
+	IconBrush.ImageSize = DrawSize * UWidgetLayoutLibrary::GetViewportScale(this);
+
+	HoverItem->SetImageBrush(IconBrush);
+	HoverItem->SetGridDimensions(GridFragment->GetGridSize());
+	HoverItem->SetInventoryItem(InventoryItem);
+	HoverItem->SetIsStackable(InventoryItem->IsStackable());
+
+	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default,HoverItem);
 }
 
 /*--------------------------------------------------*/

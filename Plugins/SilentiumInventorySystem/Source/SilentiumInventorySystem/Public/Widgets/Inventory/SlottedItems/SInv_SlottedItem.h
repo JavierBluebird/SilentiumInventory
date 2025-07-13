@@ -10,9 +10,8 @@ class USInv_InventoryItem;
 class UImage;
 class UTextBlock;
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSlottedItemClicked, int32, GridIndex, const FPointerEvent&, MouseEvent);
+
 UCLASS()
 class SILENTIUMINVENTORYSYSTEM_API USInv_SlottedItem : public UUserWidget
 {
@@ -20,6 +19,8 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_SlottedItem : public UUserWidget
 
 public:
 
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
 	// Sets whether the item is stackable
 	void SetIsStackable(bool bStackable) { bIsStackable = bStackable; }
 
@@ -52,6 +53,8 @@ public:
 	
 	void UpdateStackCount(int32 StackCount);
 
+	FSlottedItemClicked OnSlottedItemClicked;
+	
 private:
 
 	// UI image widget bound via UMG to display the item icon
