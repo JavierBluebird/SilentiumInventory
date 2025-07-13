@@ -29,7 +29,10 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryGrid : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
 	virtual void NativeOnInitialized() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 	ESInv_ItemCategory GetItemCategory() const { return ItemCategory; };
 
 	FSInv_SlotAvailabilityResult HasRoomForItem(const USInv_ItemComponent* ItemComponent);
@@ -131,7 +134,9 @@ private:
 	void AssignHoverItem(USInv_InventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex);
 
 	void RemoveItemFromGrid(const USInv_InventoryItem* InventoryItem, const int32 GridIndex);
-	
+
+	void UpdateTileParameters(const FVector2D& CanvasPos, const FVector2D& MousePos);
+	FIntPoint CalculateHoveredCoordinates(const FVector2D& CanvasPos, const FVector2D& MousePos) const;
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -167,7 +172,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USInv_HoverItem> HoverItem;
-	
+
+	FSInv_TileParameters TileParameters;
+	FSInv_TileParameters LastTileParameters;
 };
 
 

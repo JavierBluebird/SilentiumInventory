@@ -6,6 +6,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
 #include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
@@ -16,7 +17,7 @@
 #include "Items/Manifest/SInv_ItemManifest.h"
 #include "Widgets/Inventory/HoverItem/SInv_HoverItem.h"
 #include "Widgets/Inventory/SlottedItems/SInv_SlottedItem.h"
-#include "Widgets/Utils/SInv_WidgetUtils.h"
+#include "Widgets/Inventory/Utils/SInv_WidgetUtils.h"
 
 
 void USInv_InventoryGrid::NativeOnInitialized()
@@ -29,6 +30,38 @@ void USInv_InventoryGrid::NativeOnInitialized()
 
 	InventoryComponent->OnItemAdded.AddDynamic(this,&ThisClass::AddItem);
 	InventoryComponent->OnStackChange.AddDynamic(this,&ThisClass::AddStacks);
+}
+
+void USInv_InventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	const FVector2D CanvasPos = USInv_WidgetUtils::GetWidgetPosition(CanvasPanel);
+	const FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
+
+	UpdateTileParameters(CanvasPos, MousePos);
+}
+
+void USInv_InventoryGrid::UpdateTileParameters(const FVector2D& CanvasPos, const FVector2D& MousePos)
+{
+	// if Mouse not in canvas panel, return.
+	// Calculate the Tile Quadrant, tile index, and coordinates
+	const FIntPoint HoveredTileCoordinates = CalculateHoveredCoordinates(CanvasPos, MousePos);
+
+	LastTileParameters = TileParameters;
+	TileParameters.TileCoordinates = HoveredTileCoordinates;
+	TileParameters.TileIndex = USInv_WidgetUtils::GetIndexFromPosition(HoveredTileCoordinates, Columns);
+	
+	// Handle Highlight/Unhighlight of the grid slot
+}
+
+FIntPoint USInv_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& CanvasPos, const FVector2D& MousePos) const
+{
+	return FIntPoint
+	{
+		static_cast<int32>(FMath::FloorToInt((MousePos.X - CanvasPos.X) / SlotSize)),
+		static_cast<int32>(FMath::FloorToInt((MousePos.Y - CanvasPos.Y) / SlotSize))
+	};
 }
 
 void USInv_InventoryGrid::ConstructGrid()

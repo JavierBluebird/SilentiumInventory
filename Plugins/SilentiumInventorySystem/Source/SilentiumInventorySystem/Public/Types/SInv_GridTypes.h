@@ -44,3 +44,36 @@ struct FSInv_SlotAvailabilityResult
 	int32 Remainder{0}; // Amount of items we couldn't fit in the Inventory
 	TArray<FSInv_SlotAvailability> SlotAvailabilities;
 };
+
+UENUM(BlueprintType)
+enum class ESInv_TileQuadrant : uint8
+{
+	TopLeft,
+	TopRight,
+	BottomLeft,
+	BottomRight,
+	None
+};
+
+USTRUCT(BlueprintType)
+struct FSInv_TileParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Silentium Inventory")
+	FIntPoint TileCoordinates{};
+
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Silentium Inventory")
+	int32 TileIndex{INDEX_NONE};
+
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,Category = "Silentium Inventory")
+	ESInv_TileQuadrant TileQuadrant{ESInv_TileQuadrant::None};
+};
+
+// Operator == Overload
+inline bool operator == (const FSInv_TileParameters &A, const FSInv_TileParameters &B)
+{
+	return  A.TileCoordinates == B.TileCoordinates &&
+			A.TileIndex == B.TileIndex &&
+			A.TileQuadrant == B.TileQuadrant;
+}

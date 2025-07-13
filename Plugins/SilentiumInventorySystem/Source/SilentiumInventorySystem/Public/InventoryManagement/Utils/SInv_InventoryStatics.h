@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/Manifest/SInv_ItemManifest.h"
-#include "Widgets/Utils/SInv_WidgetUtils.h"
+#include "Widgets/Inventory/Utils/SInv_WidgetUtils.h"
 #include "UObject/Object.h"
 #include "SInv_InventoryStatics.generated.h"
 
