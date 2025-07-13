@@ -125,8 +125,12 @@ private:
 	bool IsRightClick(const FPointerEvent& MouseEvent) const;
 	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
 	void PickUp(USInv_InventoryItem* ClickedInventoryItem, const int32 GridIndex);
+	
 	void AssignHoverItem(USInv_InventoryItem* InventoryItem);
+	// Overload with more Info
+	void AssignHoverItem(USInv_InventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex);
 
+	void RemoveItemFromGrid(const USInv_InventoryItem* InventoryItem, const int32 GridIndex);
 	
 	/*---------------------------------------------------*/
 	/*													 */

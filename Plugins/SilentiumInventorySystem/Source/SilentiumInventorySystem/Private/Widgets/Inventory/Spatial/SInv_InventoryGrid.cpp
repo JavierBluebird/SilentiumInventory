@@ -373,10 +373,10 @@ bool USInv_InventoryGrid::IsLeftClick(const FPointerEvent& MouseEvent) const
 void USInv_InventoryGrid::PickUp(USInv_InventoryItem* ClickedInventoryItem, const int32 GridIndex)
 {
 	// Assign the Hover Item
-	AssignHoverItem(ClickedInventoryItem);
+	AssignHoverItem(ClickedInventoryItem,GridIndex,GridIndex);
 	
 	// Remove the clicked item from the grid.
-	
+	RemoveItemFromGrid(ClickedInventoryItem,GridIndex);
 }
 
 void USInv_InventoryGrid::AssignHoverItem(USInv_InventoryItem* InventoryItem)
@@ -403,6 +403,37 @@ void USInv_InventoryGrid::AssignHoverItem(USInv_InventoryItem* InventoryItem)
 	HoverItem->SetIsStackable(InventoryItem->IsStackable());
 
 	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default,HoverItem);
+}
+
+void USInv_InventoryGrid::AssignHoverItem(USInv_InventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex)
+{
+	AssignHoverItem(InventoryItem);
+
+	HoverItem->SetPreviousGridIndex(PreviousGridIndex);
+	HoverItem->UpdateStackCount(InventoryItem->IsStackable() ? GridSlotsArray[GridIndex]->GetStackCount() : 0);
+}
+
+void USInv_InventoryGrid::RemoveItemFromGrid(const USInv_InventoryItem* InventoryItem, const int32 GridIndex)
+{
+	const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(InventoryItem, FragmentTags::GridFragment);
+	if (!GridFragment) return;
+
+	USInv_InventoryStatics::ForEach2D(GridSlotsArray,GridIndex,GridFragment->GetGridSize(),Columns,
+		[&](USInv_GridSlot* GridSlot)
+		{
+			GridSlot->SetInventoryItem(nullptr);
+			GridSlot->SetUpperLeftSlotIndex(INDEX_NONE);
+			GridSlot->SetUnoccupiedTexture();
+			GridSlot->SetAvailable(true);
+			GridSlot->SetStackCount(0);
+		});
+
+	if (SlottedItems.Contains(GridIndex))
+	{
+		TObjectPtr<USInv_SlottedItem> FoundSlottedItem;
+		SlottedItems.RemoveAndCopyValue(GridIndex, FoundSlottedItem);
+		FoundSlottedItem->RemoveFromParent();
+	}
 }
 
 /*--------------------------------------------------*/
@@ -471,8 +502,6 @@ void USInv_InventoryGrid::UpdateGridSlots(USInv_InventoryItem* NewItem, const in
 				}
 	);
 }
-
-
 
 void USInv_InventoryGrid::SetSlottedItemImage(const USInv_SlottedItem* SlottedItem,
                                               const FSInv_GridFragment* GridFragment,
