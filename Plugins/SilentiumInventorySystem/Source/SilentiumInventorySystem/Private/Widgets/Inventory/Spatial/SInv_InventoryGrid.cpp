@@ -52,7 +52,62 @@ void USInv_InventoryGrid::UpdateTileParameters(const FVector2D& CanvasPos, const
 	TileParameters.TileCoordinates = HoveredTileCoordinates;
 	TileParameters.TileIndex = USInv_WidgetUtils::GetIndexFromPosition(HoveredTileCoordinates, Columns);
 	
+	TileParameters.TileQuadrant = CalculateTileQuadrant(CanvasPos, MousePos);
+	
 	// Handle Highlight/Unhighlight of the grid slot
+	OnTileParametersUpdate(TileParameters);
+	
+}
+
+void USInv_InventoryGrid::OnTileParametersUpdate(const FSInv_TileParameters& Parameters)
+{
+	if (!IsValid(HoverItem)) return;
+
+	// Get Hover Item's dimensions
+	const FIntPoint Dimensions = HoverItem->GetGridDimensions();
+	
+	// Calculate the starting coordinate for highlighting
+	const FIntPoint StartingCoordinate = CalculateStartingCoordinates(Parameters.TileCoordinates, Dimensions, Parameters.TileQuadrant);
+	
+	// Check Hover Position
+		// Are the dimensions within the grid bounds?
+		// any items in the way?
+		// if so, is there only one item in the way? (can we swap?)
+}
+
+FIntPoint USInv_InventoryGrid::CalculateStartingCoordinates(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const ESInv_TileQuadrant Quadrant) const
+{
+	const int32 HasEvenWidth = Dimensions.X % 2 == 0 ? 1 : 0;
+	const int32 HasEvenHeight= Dimensions.Y % 2 == 0 ? 1 : 0;
+
+	FIntPoint StartingCoord;
+	switch (Quadrant)
+	{
+		case ESInv_TileQuadrant::TopLeft:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+		break;
+
+		case ESInv_TileQuadrant::TopRight:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y);
+		break;
+
+		case ESInv_TileQuadrant::BottomLeft:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X);
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+		break;
+
+		case ESInv_TileQuadrant::BottomRight:
+			StartingCoord.X = Coordinate.X - FMath::FloorToInt(0.5f * Dimensions.X) + HasEvenWidth;
+			StartingCoord.Y = Coordinate.Y - FMath::FloorToInt(0.5f * Dimensions.Y) + HasEvenHeight;
+		break;
+
+		default:
+			UE_LOG(LogTemp, Error, TEXT("Invalid Quadrant"));
+			return FIntPoint(-1,-1);
+	}
+	return StartingCoord;
 }
 
 FIntPoint USInv_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& CanvasPos, const FVector2D& MousePos) const
@@ -62,6 +117,25 @@ FIntPoint USInv_InventoryGrid::CalculateHoveredCoordinates(const FVector2D& Canv
 		static_cast<int32>(FMath::FloorToInt((MousePos.X - CanvasPos.X) / SlotSize)),
 		static_cast<int32>(FMath::FloorToInt((MousePos.Y - CanvasPos.Y) / SlotSize))
 	};
+}
+
+ESInv_TileQuadrant USInv_InventoryGrid::CalculateTileQuadrant(const FVector2D& CanvasPos, const FVector2D& MousePos) const
+{
+	// Calculate relative position within the current tile
+	const float TileLocalX = FMath::Fmod(MousePos.X - CanvasPos.X,SlotSize);
+	const float TileLocalY = FMath::Fmod(MousePos.Y - CanvasPos.Y,SlotSize);
+
+	// Determine which quadrant the mouse is in
+	const bool bIsTop = TileLocalY < SlotSize / 2.f; // Top if Y is in the upper half.
+	const bool bIsLeft = TileLocalX < SlotSize / 2.f; // Left if X is in the left half.
+
+	ESInv_TileQuadrant HoveredTileQuadrant{ ESInv_TileQuadrant::None };
+	if (bIsTop && bIsLeft) HoveredTileQuadrant = ESInv_TileQuadrant::TopLeft;
+	else if (bIsTop && !bIsLeft) HoveredTileQuadrant = ESInv_TileQuadrant::TopRight;
+	else if (!bIsTop && bIsLeft) HoveredTileQuadrant = ESInv_TileQuadrant::TopLeft;
+	else if (!bIsTop && !bIsLeft) HoveredTileQuadrant = ESInv_TileQuadrant::BottomRight;
+
+	return HoveredTileQuadrant;
 }
 
 void USInv_InventoryGrid::ConstructGrid()

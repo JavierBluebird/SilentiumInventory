@@ -137,6 +137,10 @@ private:
 
 	void UpdateTileParameters(const FVector2D& CanvasPos, const FVector2D& MousePos);
 	FIntPoint CalculateHoveredCoordinates(const FVector2D& CanvasPos, const FVector2D& MousePos) const;
+	ESInv_TileQuadrant CalculateTileQuadrant(const FVector2D& CanvasPos, const FVector2D& MousePos) const;
+	void OnTileParametersUpdate(const FSInv_TileParameters& Parameters);
+	FIntPoint CalculateStartingCoordinates(const FIntPoint& Coordinate, const FIntPoint& Dimensions,  const ESInv_TileQuadrant Quadrant) const;
+	
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
