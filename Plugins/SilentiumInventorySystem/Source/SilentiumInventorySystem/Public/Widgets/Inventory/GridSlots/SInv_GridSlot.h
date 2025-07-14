@@ -73,11 +73,11 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_GridSlot;
 	
-	int32 SlotIndex;
-	int32 StackCount;
+	int32 SlotIndex{INDEX_NONE};
+	int32 StackCount{0};
 	int32 UpperLeftSlotIndex {INDEX_NONE};
+	bool bAvailable {true};
 	TWeakObjectPtr<USInv_InventoryItem> InventoryItem;
-	bool bAvailable;
 
 	ESInv_GridSlotsState GridSlotState;
 	

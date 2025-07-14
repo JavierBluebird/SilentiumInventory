@@ -25,8 +25,7 @@ void USInv_InventoryGrid::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	
 	ConstructGrid();
-	InventoryComponent = USInv_InventoryStatics::
-						GetInventoryComponent(GetOwningPlayer());
+	InventoryComponent = USInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
 
 	InventoryComponent->OnItemAdded.AddDynamic(this,&ThisClass::AddItem);
 	InventoryComponent->OnStackChange.AddDynamic(this,&ThisClass::AddStacks);
@@ -39,12 +38,62 @@ void USInv_InventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	const FVector2D CanvasPos = USInv_WidgetUtils::GetWidgetPosition(CanvasPanel);
 	const FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
 
+	if (CursorExitedCanvas(CanvasPos, USInv_WidgetUtils::GetWidgetSize(CanvasPanel),MousePos))
+	{
+		return;
+	}
 	UpdateTileParameters(CanvasPos, MousePos);
+}
+
+bool USInv_InventoryGrid::CursorExitedCanvas(const FVector2D& BoundaryPos, const FVector2D& BoundarySize,
+	const FVector2D& Location)
+{
+	bLastMouseWithinCanvas = bMouseWithinCanvas;
+	bMouseWithinCanvas = USInv_WidgetUtils::IsWithinBounds(BoundaryPos,BoundarySize,Location);
+
+	if (!bMouseWithinCanvas && bLastMouseWithinCanvas) // last frame we were within canvas.
+	{
+		UnHighlightSlots(LastHighlightedIndex,LastHighlightedDimensions);
+		return true;
+	}
+	return false;
+}
+
+void USInv_InventoryGrid::HighlightSlots(const int32 Index, const FIntPoint& Dimensions)
+{
+	UnHighlightSlots(LastHighlightedIndex, Dimensions);
+	if (!bMouseWithinCanvas) return; // If not within canvas, we don't need to highlight.
+
+	USInv_InventoryStatics::ForEach2D(GridSlotsArray, Index, Dimensions,Columns,
+		[&](USInv_GridSlot* GridSlot)
+		{
+			GridSlot->SetOccupiedTexture();
+		});
+	LastHighlightedDimensions = Dimensions;
+	LastHighlightedIndex = Index;
+}
+
+void USInv_InventoryGrid::UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions)
+{
+	USInv_InventoryStatics::ForEach2D(GridSlotsArray, Index, Dimensions,Columns,
+		[&](USInv_GridSlot* GridSlot)
+		{
+			if (GridSlot->IsAvailable())
+			{
+				GridSlot->SetUnoccupiedTexture();
+			}
+			else
+			{
+				GridSlot->SetOccupiedTexture();
+			}
+		});
 }
 
 void USInv_InventoryGrid::UpdateTileParameters(const FVector2D& CanvasPos, const FVector2D& MousePos)
 {
 	// if Mouse not in canvas panel, return.
+	if (!bMouseWithinCanvas) return;
+	
 	// Calculate the Tile Quadrant, tile index, and coordinates
 	const FIntPoint HoveredTileCoordinates = CalculateHoveredCoordinates(CanvasPos, MousePos);
 
@@ -68,11 +117,57 @@ void USInv_InventoryGrid::OnTileParametersUpdate(const FSInv_TileParameters& Par
 	
 	// Calculate the starting coordinate for highlighting
 	const FIntPoint StartingCoordinate = CalculateStartingCoordinates(Parameters.TileCoordinates, Dimensions, Parameters.TileQuadrant);
-	
+	ItemDropIndex = USInv_WidgetUtils::GetIndexFromPosition(StartingCoordinate, Columns);
+
 	// Check Hover Position
-		// Are the dimensions within the grid bounds?
-		// any items in the way?
-		// if so, is there only one item in the way? (can we swap?)
+	CurrentQueryResult = CheckHoverPosition(StartingCoordinate, Dimensions);
+
+	if (CurrentQueryResult.bHasSpace)
+	{
+		HighlightSlots(ItemDropIndex, Dimensions);
+		return;
+	}
+	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
+
+	if (CurrentQueryResult.ValidItem.IsValid())
+	{
+		// TODO: There's a single item in this space. We can swap or add stacks.
+	}
+}
+
+FSInv_SpaceQueryResult USInv_InventoryGrid::CheckHoverPosition(const FIntPoint& Position,
+	const FIntPoint& Dimensions) 
+{
+	FSInv_SpaceQueryResult Result;
+	
+	// Are the dimensions within the grid bounds?
+	if (!IsInGridBounds(USInv_WidgetUtils::GetIndexFromPosition(Position, Columns),Dimensions)) return Result;
+
+	Result.bHasSpace = true;
+	TSet<int32> OccupiedUpperLeftIndices;
+	
+	// If more than one of the indices is occupied with the same item, we need to see if they all have the same upper left index.
+	USInv_InventoryStatics::ForEach2D(GridSlotsArray,
+					USInv_WidgetUtils::GetIndexFromPosition(Position, Columns),
+					Dimensions,
+					Columns,
+					[&](const USInv_GridSlot* GridSlot)
+					{
+						if (GridSlot->GetInventoryItem().IsValid())
+						{
+							OccupiedUpperLeftIndices.Add(GridSlot->GetUpperLeftSlotIndex());
+							Result.bHasSpace = false;
+						}
+					});
+	
+	// if so, is there only one item in the way? (can we swap?)
+	if (OccupiedUpperLeftIndices.Num() == 1) // single item at position- it's valid for swapping/combining
+	{
+		const int32 Index = *OccupiedUpperLeftIndices.CreateConstIterator();
+		Result.ValidItem = GridSlotsArray[Index]->GetInventoryItem();
+		Result.UpperLeftIndex = GridSlotsArray[Index]->GetUpperLeftSlotIndex();
+	}
+	return Result;
 }
 
 FIntPoint USInv_InventoryGrid::CalculateStartingCoordinates(const FIntPoint& Coordinate, const FIntPoint& Dimensions, const ESInv_TileQuadrant Quadrant) const

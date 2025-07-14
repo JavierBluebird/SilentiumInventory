@@ -140,7 +140,12 @@ private:
 	ESInv_TileQuadrant CalculateTileQuadrant(const FVector2D& CanvasPos, const FVector2D& MousePos) const;
 	void OnTileParametersUpdate(const FSInv_TileParameters& Parameters);
 	FIntPoint CalculateStartingCoordinates(const FIntPoint& Coordinate, const FIntPoint& Dimensions,  const ESInv_TileQuadrant Quadrant) const;
-	
+	FSInv_SpaceQueryResult CheckHoverPosition(const FIntPoint& Position, const FIntPoint& Dimensions);
+
+	bool CursorExitedCanvas(const FVector2D& BoundaryPos, const FVector2D& BoundarySize, const FVector2D& Location);
+	void HighlightSlots(const int32 Index, const FIntPoint& Dimensions);
+	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
+
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -179,6 +184,15 @@ private:
 
 	FSInv_TileParameters TileParameters;
 	FSInv_TileParameters LastTileParameters;
+	FSInv_SpaceQueryResult CurrentQueryResult;
+	bool bMouseWithinCanvas;
+	bool bLastMouseWithinCanvas;
+
+	// Index where an Item would be placed if we click on the grid at a valid location.
+	int32 ItemDropIndex{INDEX_NONE};
+	
+	int32 LastHighlightedIndex;
+	FIntPoint LastHighlightedDimensions;
 };
 
 
