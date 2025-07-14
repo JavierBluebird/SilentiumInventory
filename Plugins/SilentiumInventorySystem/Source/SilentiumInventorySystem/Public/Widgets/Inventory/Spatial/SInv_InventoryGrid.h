@@ -20,6 +20,8 @@ class USInv_InventoryComponent;
 class UCanvasPanel;
 class USInv_GridSlot;
 class USInv_ItemManifest;
+enum class ESInv_GridSlotsState : uint8;
+
 /**
  * 
  */
@@ -145,7 +147,7 @@ private:
 	bool CursorExitedCanvas(const FVector2D& BoundaryPos, const FVector2D& BoundarySize, const FVector2D& Location);
 	void HighlightSlots(const int32 Index, const FIntPoint& Dimensions);
 	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
-
+	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, ESInv_GridSlotsState GridSlotState);
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
