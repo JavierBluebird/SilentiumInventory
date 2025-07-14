@@ -161,6 +161,8 @@ private:
 	void HighlightSlots(const int32 Index, const FIntPoint& Dimensions);
 	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
 	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, ESInv_GridSlotsState GridSlotState);
+	void PutDownOnIndex(const int32 Index);
+	void ClearHoveredItem();
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -209,5 +211,6 @@ private:
 	int32 LastHighlightedIndex;
 	FIntPoint LastHighlightedDimensions;
 };
+
 
 
