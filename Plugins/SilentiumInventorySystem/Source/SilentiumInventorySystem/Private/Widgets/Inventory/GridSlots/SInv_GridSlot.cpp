@@ -5,6 +5,27 @@
 
 #include "Components/Image.h"
 
+
+void USInv_GridSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+
+	GridSlotHovered.Broadcast(SlotIndex,InMouseEvent);
+}
+
+void USInv_GridSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+
+	GridSlotUnhovered.Broadcast(SlotIndex, InMouseEvent);
+}
+
+FReply USInv_GridSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	GridSlotClicked.Broadcast(SlotIndex, InMouseEvent);
+	return FReply::Handled();
+}
+
 void USInv_GridSlot::SetOccupiedTexture()
 {
 	GridSlotState = ESInv_GridSlotsState::Occupied;

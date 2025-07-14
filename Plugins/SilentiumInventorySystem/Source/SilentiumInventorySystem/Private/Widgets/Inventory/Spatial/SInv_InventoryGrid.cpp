@@ -293,7 +293,43 @@ void USInv_InventoryGrid::ConstructGrid()
 
 			// Stores the created Slot in GridSlot array
 			GridSlotsArray.Add(GridSlot);
+
+			// Bind to Slot Events
+			GridSlot->GridSlotClicked.AddDynamic(this, &ThisClass::OnGridSlotClicked);
+			GridSlot->GridSlotHovered.AddDynamic(this, &ThisClass::OnGridSlotHovered);
+			GridSlot->GridSlotUnhovered.AddDynamic(this, &ThisClass::OnGridSlotUnhovered);
 		}
+	}
+}
+
+/*-----------------------------------------------*/
+/*		Grid Slot Events Callback Functions		*/
+/*-----------------------------------------------*/
+
+void USInv_InventoryGrid::OnGridSlotClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	
+}
+
+void USInv_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+
+	USInv_GridSlot* GridSlot = GridSlotsArray[GridIndex];
+	if (GridSlot->IsAvailable())
+	{
+		GridSlot->SetOccupiedTexture();
+	}
+}
+
+void USInv_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEvent& MouseEvent)
+{
+	if (IsValid(HoverItem)) return;
+
+	USInv_GridSlot* GridSlot = GridSlotsArray[GridIndex];
+	if (GridSlot->IsAvailable())
+	{
+		GridSlot->SetUnoccupiedTexture();
 	}
 }
 
