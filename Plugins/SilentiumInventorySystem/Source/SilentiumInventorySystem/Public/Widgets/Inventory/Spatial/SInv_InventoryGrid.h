@@ -182,7 +182,11 @@ private:
 	TObjectPtr<UUserWidget> VisibleCursorWidget;
 	UPROPERTY()
 	TObjectPtr<UUserWidget> HiddenCursorWidget;
-	
+
+	bool IsSameStackable(const USInv_InventoryItem* ClickedInventoryItem) const;
+	void SwapWithHoverItem(USInv_InventoryItem* ClickedInventoryItem, const int32 GridIndex);
+	bool ShouldSwapStackCounts(const int32 RoomInClickedSlot, const int32 HoveredStackCount, const int32 MaxStackSize);
+	void SwapStackCounts(const int32 ClickedStackCount, const int32 HoveredStackCount, const int32 Index);
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
