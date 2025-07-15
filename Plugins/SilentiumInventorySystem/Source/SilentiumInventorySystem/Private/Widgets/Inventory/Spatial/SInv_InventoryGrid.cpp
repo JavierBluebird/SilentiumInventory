@@ -106,7 +106,6 @@ void USInv_InventoryGrid::UpdateTileParameters(const FVector2D& CanvasPos, const
 	
 	// Handle Highlight/Unhighlight of the grid slot
 	OnTileParametersUpdate(TileParameters);
-	
 }
 
 void USInv_InventoryGrid::OnTileParametersUpdate(const FSInv_TileParameters& Parameters)
