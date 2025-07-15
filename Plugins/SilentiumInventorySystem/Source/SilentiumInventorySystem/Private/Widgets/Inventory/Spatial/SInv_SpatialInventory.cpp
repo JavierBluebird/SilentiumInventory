@@ -62,8 +62,13 @@ void USInv_SpatialInventory::ShowCraftables()
 
 void USInv_SpatialInventory::SetActiveGrid(USInv_InventoryGrid* Grid, UButton* Button)
 {
-	DisableButton(Button);
 
+	if (ActiveGrid.IsValid()) ActiveGrid->HideCursor(); // Hide, then update and show cursor
+
+	ActiveGrid = Grid;
+	if (ActiveGrid.IsValid()) ActiveGrid->ShowCursor();
+	
+	DisableButton(Button);
 	Switcher->SetActiveWidget(Grid);
 }
 

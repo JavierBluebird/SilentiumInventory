@@ -42,6 +42,9 @@ public:
 	UFUNCTION()
 	void AddItem(USInv_InventoryItem* Item);
 	
+	void ShowCursor();
+	void HideCursor();
+	
 private:
 
 	TWeakObjectPtr<USInv_InventoryComponent> InventoryComponent;
@@ -163,6 +166,23 @@ private:
 	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, ESInv_GridSlotsState GridSlotState);
 	void PutDownOnIndex(const int32 Index);
 	void ClearHoveredItem();
+
+	/*----------------------------------*/
+	/*	  Cursor Widgets Variables	    */
+	/*----------------------------------*/
+	UUserWidget* GetVisibleCursorWidget();
+	UUserWidget* GetHiddenCursorWidget();
+
+	UPROPERTY(EditAnywhere, Category= "Silentium Inventory")
+	TSubclassOf<UUserWidget> VisibleCursorWidgetClass;
+	UPROPERTY(EditAnywhere, Category= "Silentium Inventory")
+	TSubclassOf<UUserWidget> HiddenCursorWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> VisibleCursorWidget;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> HiddenCursorWidget;
+	
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */

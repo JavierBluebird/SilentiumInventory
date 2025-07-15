@@ -31,7 +31,7 @@ public:
 	void SetImageBrush(const FSlateBrush& Brush) const;
 
 	/** Updates the displayed stack count number. */
-	void UpdateStackCount(int32 Count) const;
+	void UpdateStackCount(int32 Count);
 
 	// ----------------------------
 	//		Getters & Setters
