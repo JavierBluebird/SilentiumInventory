@@ -120,16 +120,19 @@ void USInv_InventoryGrid::OnTileParametersUpdate(const FSInv_TileParameters& Par
 	const FIntPoint StartingCoordinate = CalculateStartingCoordinates(Parameters.TileCoordinates, Dimensions, Parameters.TileQuadrant);
 	ItemDropIndex = USInv_WidgetUtils::GetIndexFromPosition(StartingCoordinate, Columns);
 
+	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
 	// Check Hover Position
 	CurrentQueryResult = CheckHoverPosition(StartingCoordinate, Dimensions);
 
 	if (CurrentQueryResult.bHasSpace)
 	{
 		HighlightSlots(ItemDropIndex, Dimensions);
+		
+		LastHighlightedIndex = ItemDropIndex;
+		LastHighlightedDimensions = Dimensions;
 		return;
 	}
-	UnHighlightSlots(LastHighlightedIndex, LastHighlightedDimensions);
-
+	
 	if (CurrentQueryResult.ValidItem.IsValid() && GridSlotsArray.IsValidIndex(CurrentQueryResult.UpperLeftIndex))
 	{
 		const FSInv_GridFragment* GridFragment = GetFragment<FSInv_GridFragment>(CurrentQueryResult.ValidItem.Get(),
