@@ -413,6 +413,46 @@ void USInv_InventoryGrid::SwapStackCounts(const int32 ClickedStackCount, const i
 	HoverItem->UpdateStackCount(ClickedStackCount);
 }
 
+bool USInv_InventoryGrid::ShouldConsumeHoverItemStacks(const int32 HoveredStackCount,
+	const int32 RoomInClickedSlot) const
+{
+	return RoomInClickedSlot >= HoveredStackCount;
+}
+
+void USInv_InventoryGrid::ConsumeHoverItemStacks(const int32 ClickedStackCount, const int32 HoveredStackCount,
+	const int32 Index)
+{
+	const int32 AmountToTransfer = HoveredStackCount;
+	const int32 NewClickedStackCount = ClickedStackCount + AmountToTransfer;
+
+	GridSlotsArray[Index]->SetStackCount(NewClickedStackCount);
+	SlottedItems.FindChecked(Index)->UpdateStackCount(NewClickedStackCount);
+	ClearHoveredItem();
+	ShowCursor();
+
+	const FSInv_GridFragment* GridFragment = GridSlotsArray[Index]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FSInv_GridFragment>();
+	const FIntPoint Dimensions = GridFragment ? GridFragment->GetGridSize() : FIntPoint(1,1);
+	HighlightSlots(Index,Dimensions);
+}
+
+bool USInv_InventoryGrid::ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const
+{
+	return RoomInClickedSlot < HoveredStackCount;
+}
+
+void USInv_InventoryGrid::FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index)
+{
+	USInv_GridSlot* GridSlot = GridSlotsArray[Index];
+	const int32 NewStackCount = GridSlot->GetStackCount() + FillAmount;
+
+	GridSlot->SetStackCount(NewStackCount);
+
+	USInv_SlottedItem* ClickedSlottedItem = SlottedItems.FindChecked(Index);
+	ClickedSlottedItem->UpdateStackCount(NewStackCount);
+
+	HoverItem->UpdateStackCount(Remainder);
+}
+
 void USInv_InventoryGrid::ShowCursor()
 {
 	if (!IsValid(GetOwningPlayer())) return;
@@ -760,11 +800,26 @@ void USInv_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEv
 		if (ShouldSwapStackCounts(RoomInClickedSlot,HoveredStackCount,MaxStackSize))
 		{
 			SwapStackCounts(ClickedStackCount,HoveredStackCount,GridIndex);
+			return;
 		}
-		// Should we consume the hover item's stacks?
+		// Should we consume the hover item's stacks? (Room in the clicked slot >= HoveredStackCount)
+		if (ShouldConsumeHoverItemStacks(HoveredStackCount,RoomInClickedSlot))
+		{
+			ConsumeHoverItemStacks(ClickedStackCount,HoveredStackCount,GridIndex);
+			return;
+		}
 		// Should we fill in the stacks of the clicked item? (adn not consume the hovered item)
-		// Is there no room in the clicked slot?
-		return;
+		if (ShouldFillInStack(RoomInClickedSlot,HoveredStackCount))
+		{
+			FillInStack(RoomInClickedSlot,HoveredStackCount - RoomInClickedSlot ,GridIndex);
+			return;
+		}
+		
+		// Clicked slot is already full - do nothing (maybe play a sound?)
+		if (RoomInClickedSlot == 0)
+		{
+			return;
+		}
 	}
 	// Swap with the hovered item.
 	SwapWithHoverItem(ClickedInventoryItem,GridIndex);
