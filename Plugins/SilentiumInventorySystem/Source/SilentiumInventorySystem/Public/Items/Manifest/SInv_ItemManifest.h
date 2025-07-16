@@ -37,6 +37,8 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 
 	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
 	T* GetFragmentOfTypeMutable();
+
+	void SpawnPickUpActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation);
 	
 private:
 
@@ -48,7 +50,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	FGameplayTag ItemType;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
+	TSubclassOf<AActor> PickupActorClass;
 };
 
 /*--------------------------------------------*/

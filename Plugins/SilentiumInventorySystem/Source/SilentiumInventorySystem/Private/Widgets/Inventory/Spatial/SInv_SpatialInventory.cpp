@@ -28,6 +28,12 @@ void USInv_SpatialInventory::NativeOnInitialized()
 	ShowEquippables();
 }
 
+FReply USInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	ActiveGrid->DropItem();
+	return FReply::Handled();
+}
+
 FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemComponent* ItemComponent) const
 {
 	switch (USInv_InventoryStatics::GetItemCategoryFromItemComp(ItemComponent))

@@ -39,6 +39,44 @@ void USInv_InventoryComponent::ConstructInventory()
 }
 
 
+void USInv_InventoryComponent::Server_DropItem_Implementation(USInv_InventoryItem* Item, int32 StackCount)
+{
+	const int32 NewStackCount = Item->GetTotalStackCount() - StackCount;
+	
+	if (NewStackCount <= 0)
+	{
+		InventoryList.RemoveItemEntry(Item); // Remove from Fast Array
+	}
+	else
+	{
+		Item->SetTotalStackCount(NewStackCount);
+	}
+	
+	SpawnDroppedItem(Item,StackCount);
+}
+
+void USInv_InventoryComponent::SpawnDroppedItem(USInv_InventoryItem* Item, const int32 StackCount)
+{
+	
+	const APawn* OwningPawn = OwningController->GetPawn();
+	
+	FVector RotatedForward = OwningPawn->GetActorForwardVector();
+	RotatedForward = RotatedForward.RotateAngleAxis(FMath::FRandRange(DropSpawnAngleMin,DropSpawnAngleMax), FVector::UpVector);
+
+	FVector SpawnLocation = OwningPawn->GetActorLocation() + RotatedForward * FMath::FRandRange(DropSpawnDistanceMin,DropSpawnDistanceMax);
+	SpawnLocation.Z -= RelativeSpawnElevation;
+	const FRotator SpawnRotator = FRotator::ZeroRotator;
+
+	FSInv_ItemManifest& ItemManifest = Item->GetItemManifestMutable();
+	if (FSInv_StackableFragment* StackableFragment = ItemManifest.GetFragmentOfTypeMutable<FSInv_StackableFragment>())
+	{
+		StackableFragment->SetStackCount(StackCount);
+	}
+
+	ItemManifest.SpawnPickUpActor(this,SpawnLocation,SpawnRotator);
+	
+}
+
 void USInv_InventoryComponent::AddRepSubObj(UObject* SubObj)
 {
 	if (IsUsingRegisteredSubObjectList() == true && IsReadyForReplication() == true

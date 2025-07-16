@@ -36,9 +36,12 @@ public:
 	UFUNCTION(Server,Reliable)
 	void Server_AddStacksToItem(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 
-	void AddRepSubObj(UObject* SubObj);
+	UFUNCTION(Server,Reliable)
+	void Server_DropItem(USInv_InventoryItem* Item, int32 StackCount);
 	
+	void AddRepSubObj(UObject* SubObj);
 	void ToggleInventoryMenu();
+	void SpawnDroppedItem(USInv_InventoryItem* Item, const int32 StackCount);
 	
 	/*-------------------------------*/
 	/*		Inventory Delegates		 */
@@ -66,7 +69,7 @@ private:
 	
 	TWeakObjectPtr<APlayerController> OwningController;
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System|HUD ")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | HUD ")
 	TSubclassOf<USInv_InventoryBase> InventoryMenuClass;
 
 	UPROPERTY()
@@ -76,4 +79,19 @@ private:
 	bool bInventoryMenuOpen;
 	void OpenInventoryMenu();
 	void CloseInventoryMenu();
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | Drop Item Settings")
+	float DropSpawnAngleMin = -85.f;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | Drop Item Settings")
+	float DropSpawnAngleMax = 85.f;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | Drop Item Settings")
+	float DropSpawnDistanceMin = -10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | Drop Item Settings")
+	float DropSpawnDistanceMax = 50.f;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory System | Drop Item Settings")
+	float RelativeSpawnElevation = 70.f;
 };

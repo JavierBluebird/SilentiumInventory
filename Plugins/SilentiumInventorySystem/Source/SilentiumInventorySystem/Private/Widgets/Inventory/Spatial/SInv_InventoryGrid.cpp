@@ -497,11 +497,30 @@ void USInv_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEve
 
 void USInv_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmount, int32 Index)
 {
+	USInv_InventoryItem* RightClickedItem = GridSlotsArray[Index]->GetInventoryItem().Get();
 	
+	if (!IsValid(RightClickedItem)) return;
+	if (!RightClickedItem->IsStackable()) return;
+	
+	const int32 UpperLeftIndex = GridSlotsArray[Index]->GetUpperLeftSlotIndex();
+	USInv_GridSlot* UpperLeftGridSlot = GridSlotsArray[UpperLeftIndex];
+	const int32 StackCount = UpperLeftGridSlot->GetStackCount();
+	const int32 NewStackCount = StackCount - SplitAmount;
+
+	UpperLeftGridSlot->SetStackCount(NewStackCount); // Updates item new stack count
+	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
+
+	AssignHoverItem(RightClickedItem, UpperLeftIndex, UpperLeftIndex);
+	HoverItem->UpdateStackCount(SplitAmount);
 }
 
 void USInv_InventoryGrid::OnPopUpMenuDrop(int32 Index)
 {
+	USInv_InventoryItem* RightClickedItem = GridSlotsArray[Index]->GetInventoryItem().Get();
+	if (!IsValid(RightClickedItem)) return;
+
+	PickUp(RightClickedItem, Index);
+	DropItem();
 }
 
 void USInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
@@ -902,6 +921,17 @@ void USInv_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
 	{
 		PopUpItem->CollapseConsumeButton();
 	}
+}
+
+void USInv_InventoryGrid::DropItem()
+{
+	if (!IsValid(HoverItem)) return;
+	if (!IsValid(HoverItem->GetInventoryItem())) return;
+
+	InventoryComponent->Server_DropItem(HoverItem->GetInventoryItem(), HoverItem->GetStackCount());
+
+	ClearHoveredItem();
+	ShowCursor();
 }
 
 bool USInv_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const
