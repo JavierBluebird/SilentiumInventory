@@ -141,6 +141,19 @@ private:
 
 	UFUNCTION()
 	void OnGridSlotUnhovered(int32 GridIndex, const FPointerEvent& MouseEvent);
+
+	/*---------------------------------------------------*/
+	/*		PopUp Menu Events Callback Functions		*/
+	/*--------------------------------------------------*/
+	
+	UFUNCTION()
+	void OnPopUpMenuSplit(int32 SplitAmount, int32 Index);
+
+	UFUNCTION()
+	void OnPopUpMenuDrop(int32 Index);
+
+	UFUNCTION()
+	void OnPopUpMenuConsume(int32 Index);
 	
 	/*----------------------------------*/
 	/*		Hover Item Mouse Events		*/
@@ -232,6 +245,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<USInv_HoverItem> HoverItem;
 
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	FVector2D ItemPopUpOffset;
+	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	TSubclassOf<USInv_ItemPopUp> PopUpItemClass;
 

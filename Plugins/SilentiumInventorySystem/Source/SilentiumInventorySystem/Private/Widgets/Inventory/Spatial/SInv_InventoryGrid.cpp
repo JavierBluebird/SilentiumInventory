@@ -495,6 +495,19 @@ void USInv_InventoryGrid::OnGridSlotUnhovered(int32 GridIndex, const FPointerEve
 	}
 }
 
+void USInv_InventoryGrid::OnPopUpMenuSplit(int32 SplitAmount, int32 Index)
+{
+	
+}
+
+void USInv_InventoryGrid::OnPopUpMenuDrop(int32 Index)
+{
+}
+
+void USInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
+{
+}
+
 bool USInv_InventoryGrid::MatchesCategory(const USInv_InventoryItem* Item) const
 {
 	return Item->GetItemManifest().GetItemCategory() == ItemCategory;
@@ -844,13 +857,51 @@ void USInv_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
 	USInv_InventoryItem* RightClickedItem = GridSlotsArray[GridIndex]->GetInventoryItem().Get();
 	if (!IsValid(RightClickedItem)) return;
 
+	if (IsValid(GridSlotsArray[GridIndex]->GetItemPopUp())) return;
+	
 	PopUpItem = CreateWidget<USInv_ItemPopUp>(this,PopUpItemClass);
+	GridSlotsArray[GridIndex]->SetItemPopUp(PopUpItem); // Sets weak object reference on Grid Slot.
+	
 	OwningCanvasPanel->AddChild(PopUpItem);
 
 	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(PopUpItem);
 	const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
-	CanvasSlot->SetPosition(MousePosition);
+	CanvasSlot->SetPosition(MousePosition - ItemPopUpOffset);
 	CanvasSlot->SetSize(PopUpItem->GetBoxSize());
+	/*---------------------------------------------------------------------*/
+	/*					Split Functionality Binding						   */
+	/*		Check if Splittable, then calculate slider values			   */
+	/*				or hide Split functionalities						   */
+	/*---------------------------------------------------------------------*/
+	
+	const int32 SliderMax = GridSlotsArray[GridIndex]->GetStackCount() - 1;
+	if (RightClickedItem->IsStackable() && SliderMax > 0)
+	{
+		PopUpItem->OnSplit.BindDynamic(this,&ThisClass::OnPopUpMenuSplit);
+		PopUpItem->SetSliderParams(SliderMax,FMath::Max(1,GridSlotsArray[GridIndex]->GetStackCount() / 2)); // we make sure it's never 0 and in the middle
+	}
+	else
+	{
+		PopUpItem->CollapseSplitButton();
+	}
+	/*---------------------------------------------------------------------*/
+	/*					 Drop Functionality Binding					       */
+	/*---------------------------------------------------------------------*/
+	
+	PopUpItem->OnDrop.BindDynamic(this,&ThisClass::OnPopUpMenuDrop);
+	
+	/*---------------------------------------------------------------------*/
+	/*					 Consume Functionality Binding					   */
+	/*---------------------------------------------------------------------*/
+
+	if (RightClickedItem->IsConsumable())
+	{
+		PopUpItem->OnConsume.BindDynamic(this,&ThisClass::OnPopUpMenuConsume);
+	}
+	else
+	{
+		PopUpItem->CollapseConsumeButton();
+	}
 }
 
 bool USInv_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const

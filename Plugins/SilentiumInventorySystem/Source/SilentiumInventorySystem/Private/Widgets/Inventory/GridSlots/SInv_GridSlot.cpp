@@ -2,7 +2,7 @@
 
 
 #include "Widgets/Inventory/GridSlots/SInv_GridSlot.h"
-
+#include "Widgets/ItemPopUp/SInv_ItemPopUp.h"
 #include "Components/Image.h"
 
 
@@ -54,3 +54,21 @@ void USInv_GridSlot::SetInventoryItem(TWeakObjectPtr<USInv_InventoryItem> Item)
 {
 	InventoryItem = Item;
 }
+
+void USInv_GridSlot::SetItemPopUp(USInv_ItemPopUp* PopUp)
+{
+	ItemPopUp = PopUp;
+	ItemPopUp->SetGridIndex(GetIndex());
+	ItemPopUp->OnNativeDestruct.AddUObject(this,&ThisClass::OnItemPopUpDestruct);
+}
+
+void USInv_GridSlot::OnItemPopUpDestruct(UUserWidget* Menu)
+{
+	ItemPopUp.Reset();
+}
+
+USInv_ItemPopUp* USInv_GridSlot::GetItemPopUp() const
+{
+	return ItemPopUp.Get(); 
+}
+

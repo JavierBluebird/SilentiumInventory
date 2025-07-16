@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "SInv_GridSlot.generated.h"
 
+class USInv_ItemPopUp;
 class USInv_InventoryItem;
 class UImage;
 
@@ -83,19 +84,28 @@ public:
 	FGridSlotEvent GridSlotClicked;
 	FGridSlotEvent GridSlotHovered;
 	FGridSlotEvent GridSlotUnhovered;
+
+	void SetItemPopUp(USInv_ItemPopUp* PopUp);
+	USInv_ItemPopUp* GetItemPopUp() const;
 	
 private:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_GridSlot;
 	
-	int32 SlotIndex{INDEX_NONE};
 	int32 StackCount{0};
-	int32 UpperLeftSlotIndex {INDEX_NONE};
 	bool bAvailable {true};
+	int32 SlotIndex{INDEX_NONE};
+	int32 UpperLeftSlotIndex {INDEX_NONE};
+
+	/*--------------------------------------*/
+	/*		  Weak Object Pointers    		*/
+	/*--------------------------------------*/
 	TWeakObjectPtr<USInv_InventoryItem> InventoryItem;
+	TWeakObjectPtr<USInv_ItemPopUp> ItemPopUp;
 
 	ESInv_GridSlotsState GridSlotState;
+
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	FSlateBrush Brush_Unoccupied;
@@ -108,5 +118,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	FSlateBrush Brush_GrayedOut;
-	
+
+	UFUNCTION()
+	void OnItemPopUpDestruct(UUserWidget* Menu);
 };

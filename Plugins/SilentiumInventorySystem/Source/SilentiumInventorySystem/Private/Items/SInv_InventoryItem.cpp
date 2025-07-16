@@ -18,6 +18,11 @@ bool USInv_InventoryItem::IsStackable() const
 	return Stackable != nullptr;
 }
 
+bool USInv_InventoryItem::IsConsumable() const
+{
+	return GetItemManifest().GetItemCategory() == ESInv_ItemCategory::Consumable;
+}
+
 void USInv_InventoryItem::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);

@@ -29,6 +29,7 @@ public:
 	FSInv_ItemManifest& GetItemManifestMutable() { return ItemManifest.GetMutable<FSInv_ItemManifest>(); }
 
 	bool IsStackable() const;
+	bool IsConsumable() const;
 
 	int32 GetTotalStackCount() const { return TotalStackCount; };
 	void SetTotalStackCount(const int32 StackCount) { TotalStackCount = StackCount; };
