@@ -10,6 +10,7 @@
 #include "SInv_InventoryGrid.generated.h"
 
 
+class USInv_ItemPopUp;
 class USInv_HoverItem;
 struct FSInv_ImageFragment;
 struct FSInv_GridFragment;
@@ -44,10 +45,12 @@ public:
 	
 	void ShowCursor();
 	void HideCursor();
+	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	
 private:
 
 	TWeakObjectPtr<USInv_InventoryComponent> InventoryComponent;
+	TWeakObjectPtr<UCanvasPanel> OwningCanvasPanel;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "Silentium Inventory")
 	ESInv_ItemCategory ItemCategory;
@@ -191,6 +194,8 @@ private:
 	void ConsumeHoverItemStacks(const int32 ClickedStackCount, const int32 HoveredStackCount, const int32 Index);
 	bool ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const;
 	void FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index);
+	void CreateItemPopUp(const int32 GridIndex);
+	
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
@@ -227,6 +232,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<USInv_HoverItem> HoverItem;
 
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TSubclassOf<USInv_ItemPopUp> PopUpItemClass;
+
+	UPROPERTY()
+	TObjectPtr<USInv_ItemPopUp> PopUpItem;
+	
 	FSInv_TileParameters TileParameters;
 	FSInv_TileParameters LastTileParameters;
 	FSInv_SpaceQueryResult CurrentQueryResult;

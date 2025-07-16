@@ -17,6 +17,7 @@
 #include "Items/Manifest/SInv_ItemManifest.h"
 #include "Widgets/Inventory/HoverItem/SInv_HoverItem.h"
 #include "Widgets/Inventory/SlottedItems/SInv_SlottedItem.h"
+#include "Widgets/ItemPopUp/SInv_ItemPopUp.h"
 #include "Widgets/Inventory/Utils/SInv_WidgetUtils.h"
 
 
@@ -467,6 +468,11 @@ void USInv_InventoryGrid::HideCursor()
 	GetOwningPlayer()->SetMouseCursorWidget(EMouseCursor::Default, GetHiddenCursorWidget());
 }
 
+void USInv_InventoryGrid::SetOwningCanvas(UCanvasPanel* OwningCanvas)
+{
+	OwningCanvasPanel = OwningCanvas;
+}
+
 void USInv_InventoryGrid::OnGridSlotHovered(int32 GridIndex, const FPointerEvent& MouseEvent)
 {
 	if (IsValid(HoverItem)) return;
@@ -788,6 +794,12 @@ void USInv_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEv
 		PickUp(ClickedInventoryItem,GridIndex);
 		return;
 	}
+
+	if (IsRightClick(MouseEvent))
+	{
+		CreateItemPopUp(GridIndex);
+		return;
+	}
 	
 	// Do the hovered item and the clicked inventory item share a type, and are they stackable?
 	if (IsSameStackable(ClickedInventoryItem))
@@ -825,6 +837,20 @@ void USInv_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEv
 	}
 	// Swap with the hovered item.
 	SwapWithHoverItem(ClickedInventoryItem,GridIndex);
+}
+
+void USInv_InventoryGrid::CreateItemPopUp(const int32 GridIndex)
+{
+	USInv_InventoryItem* RightClickedItem = GridSlotsArray[GridIndex]->GetInventoryItem().Get();
+	if (!IsValid(RightClickedItem)) return;
+
+	PopUpItem = CreateWidget<USInv_ItemPopUp>(this,PopUpItemClass);
+	OwningCanvasPanel->AddChild(PopUpItem);
+
+	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(PopUpItem);
+	const FVector2D MousePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
+	CanvasSlot->SetPosition(MousePosition);
+	CanvasSlot->SetSize(PopUpItem->GetBoxSize());
 }
 
 bool USInv_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const

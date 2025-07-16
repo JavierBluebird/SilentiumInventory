@@ -7,6 +7,7 @@
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 #include "SInv_SpatialInventory.generated.h"
 
+class UCanvasPanel;
 class UButton;
 class UWidgetSwitcher;
 class USInv_InventoryGrid;
@@ -36,6 +37,9 @@ private:
 	// --------------------//
 	// Grid objects	      //
 	// ------------------//
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UCanvasPanel> CanvasPanel;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<USInv_InventoryGrid> Grid_Equippables;
