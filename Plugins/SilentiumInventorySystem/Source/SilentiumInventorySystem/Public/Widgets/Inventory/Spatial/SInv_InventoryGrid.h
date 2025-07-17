@@ -47,7 +47,7 @@ public:
 	void HideCursor();
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	void DropItem();
-
+	bool HasHoverItem() const;
 	
 private:
 

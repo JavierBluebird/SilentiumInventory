@@ -9,6 +9,7 @@
 
 
 class USInv_ItemComponent;
+class USInv_InventoryItem;
 
 UCLASS()
 class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryBase : public UUserWidget
@@ -17,4 +18,8 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryBase : public UUserWidget
 
 public:
 	virtual FSInv_SlotAvailabilityResult HasRoomForItem(USInv_ItemComponent* ItemComponent) const { return FSInv_SlotAvailabilityResult(); };
+
+	virtual void OnItemHovered(USInv_InventoryItem* InventoryItem) { }
+	virtual void OnItemUnhovered() { }
+	virtual bool HasHoverItem() const { return false; }
 };

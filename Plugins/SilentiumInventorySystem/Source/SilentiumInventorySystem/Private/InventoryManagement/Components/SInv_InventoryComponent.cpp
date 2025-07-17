@@ -78,6 +78,11 @@ void USInv_InventoryComponent::SpawnDroppedItem(USInv_InventoryItem* Item, const
 	
 }
 
+USInv_InventoryBase* USInv_InventoryComponent::GetInventoryMenu() const
+{
+	return InventoryMenuReference;
+}
+
 void USInv_InventoryComponent::Server_ConsumeItem_Implementation(USInv_InventoryItem* Item)
 {
 	const int32 NewStackCount = Item->GetTotalStackCount() - 1;

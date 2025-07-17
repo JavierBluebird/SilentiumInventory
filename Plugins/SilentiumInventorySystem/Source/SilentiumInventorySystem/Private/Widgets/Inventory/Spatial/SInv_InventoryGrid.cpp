@@ -951,6 +951,11 @@ void USInv_InventoryGrid::DropItem()
 	ShowCursor();
 }
 
+bool USInv_InventoryGrid::HasHoverItem() const
+{
+	return IsValid(HoverItem);
+}
+
 bool USInv_InventoryGrid::IsRightClick(const FPointerEvent& MouseEvent) const
 {
 	return MouseEvent.GetEffectingButton() == EKeys::RightMouseButton;

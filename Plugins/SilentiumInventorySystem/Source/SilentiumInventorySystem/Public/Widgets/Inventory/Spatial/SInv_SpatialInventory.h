@@ -26,6 +26,10 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
 	virtual FSInv_SlotAvailabilityResult HasRoomForItem(USInv_ItemComponent* ItemComponent) const override;
+
+	virtual void OnItemHovered(USInv_InventoryItem* InventoryItem) override;
+	virtual bool HasHoverItem() const override;
+	virtual void OnItemUnhovered() override;
 	
 private:
 

@@ -8,6 +8,7 @@
 #include "UObject/Object.h"
 #include "SInv_InventoryStatics.generated.h"
 
+class USInv_InventoryComponent;
 struct FSInv_ItemManifest;
 class USInv_ItemComponent;
 /**
@@ -28,6 +29,12 @@ public:
 
 	template<typename T, typename FuncT>
 	static void ForEach2D(TArray<T>& Array, int32 Index, const FIntPoint& Range2D, int32 GridColumns, const FuncT& Function);
+
+	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
+	static void ItemHovered(APlayerController* PC, USInv_InventoryItem* Item);
+
+	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
+	static void ItemUnhovered(APlayerController* PC);
 };
 
 /*---------------------------------*/
