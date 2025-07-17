@@ -6,8 +6,10 @@
 #include "SilentiumInventorySystem.h"
 #include "Widgets/Inventory/Spatial/SInv_InventoryGrid.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanel.h"
 #include "Components/WidgetSwitcher.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
+#include "Widgets/ItemDescription/SInv_ItemDescription.h"
 
 
 void USInv_SpatialInventory::NativeOnInitialized()
@@ -56,7 +58,27 @@ FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemCo
 
 void USInv_SpatialInventory::OnItemHovered(USInv_InventoryItem* InventoryItem)
 {
-	Super::OnItemHovered(InventoryItem);
+	USInv_ItemDescription* DescriptionWidget = GetItemDescription();
+	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer); // If it's active, deactivate first.
+	
+	FTimerDelegate DescriptionTimerDelegate;
+	DescriptionTimerDelegate.BindLambda([this]() // Defines the delegate functionality
+		{
+			GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
+	);
+	GetOwningPlayer()->GetWorldTimerManager().SetTimer(DescriptionTimer,  // Actually Starts timer
+														  DescriptionTimerDelegate,
+														  DescriptionTimerDelay,
+														  false);
+}
+
+void USInv_SpatialInventory::OnItemUnhovered()
+{
+	GetItemDescription()->SetVisibility(ESlateVisibility::Collapsed);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer);
 }
 
 bool USInv_SpatialInventory::HasHoverItem() const
@@ -68,11 +90,15 @@ bool USInv_SpatialInventory::HasHoverItem() const
 	return false;
 }
 
-void USInv_SpatialInventory::OnItemUnhovered()
+USInv_ItemDescription* USInv_SpatialInventory::GetItemDescription()
 {
-	Super::OnItemUnhovered();
+	if (!IsValid(ItemDescription))
+	{
+		ItemDescription = CreateWidget<USInv_ItemDescription>(GetOwningPlayer(),ItemDescriptionClass);
+		CanvasPanel->AddChild(ItemDescription);
+	}
+	return ItemDescription;
 }
-
 
 void USInv_SpatialInventory::ShowEquippables()
 {

@@ -7,6 +7,7 @@
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 #include "SInv_SpatialInventory.generated.h"
 
+class USInv_ItemDescription;
 class UCanvasPanel;
 class UButton;
 class UWidgetSwitcher;
@@ -68,6 +69,23 @@ private:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> Button_Craftables;
+
+	// ----------------------------//
+	// Item Description objects	  //
+	// --------------------------//
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USInv_ItemDescription> ItemDescriptionClass;
+
+	UPROPERTY()
+	TObjectPtr<USInv_ItemDescription> ItemDescription;
+
+	USInv_ItemDescription* GetItemDescription();
+
+	FTimerHandle DescriptionTimer;
+
+	UPROPERTY(EditAnywhere,Category="Silentium Inventory", meta =(ToolTip = "How much time will it take for Item Description Widget to Show up"))
+	float DescriptionTimerDelay {0.5f};
 	
 	// --------------------//
 	// Callback Functions //
