@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Items/SInv_InventoryItem.h"
 #include "Items/Fragments/SInv_ItemFragment.h"
+#include "Runtime/Engine/Internal/VT/VirtualTextureVisualizationData.h"
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 
 USInv_InventoryComponent::USInv_InventoryComponent() : InventoryList(this)
@@ -75,6 +76,24 @@ void USInv_InventoryComponent::SpawnDroppedItem(USInv_InventoryItem* Item, const
 
 	ItemManifest.SpawnPickUpActor(this,SpawnLocation,SpawnRotator);
 	
+}
+
+void USInv_InventoryComponent::Server_ConsumeItem_Implementation(USInv_InventoryItem* Item)
+{
+	const int32 NewStackCount = Item->GetTotalStackCount() - 1;
+	if (NewStackCount <= 0)
+	{
+		InventoryList.RemoveItemEntry(Item);
+	}
+	else
+	{
+		Item->SetTotalStackCount(NewStackCount);
+	}
+	// Get the consumable fragment and call Consume()
+	if (FSInv_ConsumableFragment* ConsumableFragment = Item->GetItemManifestMutable().GetFragmentOfTypeMutable<FSInv_ConsumableFragment>())
+	{
+		ConsumableFragment->OnConsume(OwningController.Get());
+	}
 }
 
 void USInv_InventoryComponent::AddRepSubObj(UObject* SubObj)

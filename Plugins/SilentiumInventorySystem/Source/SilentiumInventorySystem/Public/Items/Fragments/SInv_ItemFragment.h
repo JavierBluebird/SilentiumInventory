@@ -6,7 +6,7 @@
 #include "Types/AttributeStorage.h"
 #include "SInv_ItemFragment.generated.h"
 
-
+class APlayerController;
 /*----------------------------------------------------------------*/
 /*															 	  */
 /*					Item Fragments Parent Struct				  */
@@ -54,7 +54,7 @@ struct FSInv_ItemFragment
 	
 	private:
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "FragmentTags"))
 	FGameplayTag FragmentTag = FGameplayTag::EmptyTag;
 };
 
@@ -128,4 +128,42 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Amount of items we will get on the Stack when Item gets picked up."))
 	int32 StackCount {1};
+};
+
+/*---------------------------------------------------------*/
+/*														  */
+/*				Base Consumable Fragment			 	  */
+/*														  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_ConsumableFragment : public FSInv_ItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void OnConsume(APlayerController* PC) {}
+};
+
+/*---------------------------------------------------------*/
+/*				Consumable Child Fragments			 	  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_HealthPotionFragment : public FSInv_ConsumableFragment
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	float HealAmount {20.f};
+	
+	virtual void OnConsume(APlayerController* PC) override;
+};
+
+USTRUCT(BlueprintType)
+struct FSInv_ManaPotionFragment : public FSInv_ConsumableFragment
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	float ManaAmount {20.f};
+	
+	virtual void OnConsume(APlayerController* PC) override;
 };

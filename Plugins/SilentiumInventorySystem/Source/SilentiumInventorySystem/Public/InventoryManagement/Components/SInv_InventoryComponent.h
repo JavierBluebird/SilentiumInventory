@@ -29,7 +29,14 @@ public:
 
 	UFUNCTION(BlueprintCallable,BlueprintAuthorityOnly, Category = "Silentium Inventory")
 	void TryAddItem(USInv_ItemComponent* ItemComponent);
-
+	
+	void AddRepSubObj(UObject* SubObj);
+	void ToggleInventoryMenu();
+	void SpawnDroppedItem(USInv_InventoryItem* Item, const int32 StackCount);
+	
+	/*-------------------------------*/
+	/*			Server RPCs			 */
+	/*-------------------------------*/
 	UFUNCTION(Server,Reliable)
 	void Server_AddNewItem(USInv_ItemComponent* ItemComponent, int32 StackCount);
 
@@ -38,10 +45,9 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void Server_DropItem(USInv_InventoryItem* Item, int32 StackCount);
-	
-	void AddRepSubObj(UObject* SubObj);
-	void ToggleInventoryMenu();
-	void SpawnDroppedItem(USInv_InventoryItem* Item, const int32 StackCount);
+
+	UFUNCTION(Server,Reliable)
+	void Server_ConsumeItem(USInv_InventoryItem* Item);
 	
 	/*-------------------------------*/
 	/*		Inventory Delegates		 */

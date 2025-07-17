@@ -525,6 +525,23 @@ void USInv_InventoryGrid::OnPopUpMenuDrop(int32 Index)
 
 void USInv_InventoryGrid::OnPopUpMenuConsume(int32 Index)
 {
+	USInv_InventoryItem* RightClickedItem = GridSlotsArray[Index]->GetInventoryItem().Get();
+	if (!IsValid(RightClickedItem)) return;
+
+	// Upper left info
+	const int32 UpperLeftIndex = GridSlotsArray[Index]->GetUpperLeftSlotIndex();
+	USInv_GridSlot* UpperLeftGridSlot = GridSlotsArray[UpperLeftIndex];
+	const int32 NewStackCount = UpperLeftGridSlot->GetStackCount() - 1;
+
+	UpperLeftGridSlot->SetStackCount(NewStackCount);
+	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
+	
+	InventoryComponent->Server_ConsumeItem(RightClickedItem);
+	
+	if (NewStackCount <= 0)
+	{
+		RemoveItemFromGrid(RightClickedItem,UpperLeftIndex);
+	}
 }
 
 bool USInv_InventoryGrid::MatchesCategory(const USInv_InventoryItem* Item) const

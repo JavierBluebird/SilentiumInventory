@@ -48,7 +48,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	ESInv_ItemCategory ItemCategory { ESInv_ItemCategory::None };
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties", meta = (Categories = "GameItems"))
 	FGameplayTag ItemType;
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
