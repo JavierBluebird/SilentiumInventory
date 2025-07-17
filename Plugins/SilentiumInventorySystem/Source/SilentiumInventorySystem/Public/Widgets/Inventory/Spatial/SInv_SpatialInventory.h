@@ -26,6 +26,8 @@ public:
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 	virtual FSInv_SlotAvailabilityResult HasRoomForItem(USInv_ItemComponent* ItemComponent) const override;
 
 	virtual void OnItemHovered(USInv_InventoryItem* InventoryItem) override;
@@ -86,7 +88,8 @@ private:
 
 	UPROPERTY(EditAnywhere,Category="Silentium Inventory", meta =(ToolTip = "How much time will it take for Item Description Widget to Show up"))
 	float DescriptionTimerDelay {0.5f};
-	
+
+	void SetItemDescriptionSizeAndPosition(USInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
 	// --------------------//
 	// Callback Functions //
 	// -------------------//
