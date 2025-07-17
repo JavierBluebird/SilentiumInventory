@@ -835,7 +835,6 @@ USInv_SlottedItem* USInv_InventoryGrid::CreateSlottedItem(USInv_InventoryItem* I
 
 void USInv_InventoryGrid::OnSlottedItemClicked(int32 GridIndex, const FPointerEvent& MouseEvent)
 {
-
 	USInv_InventoryStatics::ItemUnhovered(GetOwningPlayer());
 	
 	check(GridSlotsArray.IsValidIndex(GridIndex));

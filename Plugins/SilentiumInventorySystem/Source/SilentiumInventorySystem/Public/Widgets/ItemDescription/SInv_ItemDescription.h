@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "Widgets/Composite/SInv_Composite.h"
 #include "SInv_ItemDescription.generated.h"
 
 class USizeBox;
@@ -11,7 +11,7 @@ class USizeBox;
  * 
  */
 UCLASS()
-class SILENTIUMINVENTORYSYSTEM_API USInv_ItemDescription : public UUserWidget
+class SILENTIUMINVENTORYSYSTEM_API USInv_ItemDescription : public USInv_Composite
 {
 	GENERATED_BODY()
 	
