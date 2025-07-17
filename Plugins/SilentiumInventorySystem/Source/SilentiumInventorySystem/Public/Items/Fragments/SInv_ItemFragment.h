@@ -6,6 +6,7 @@
 #include "Types/AttributeStorage.h"
 #include "SInv_ItemFragment.generated.h"
 
+class USInv_CompositeBase;
 class APlayerController;
 /*----------------------------------------------------------------*/
 /*															 	  */
@@ -166,4 +167,21 @@ struct FSInv_ManaPotionFragment : public FSInv_ConsumableFragment
 	float ManaAmount {20.f};
 	
 	virtual void OnConsume(APlayerController* PC) override;
+};
+
+/*--------------------------------------------------------*/
+/*														  */
+/*				Inventory Item Fragment					  */
+/*		Specific for Assimilation within a Widget		  */
+/*														  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_InventoryItemFragment : public FSInv_ItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Assimilate(USInv_CompositeBase* Composite) const;
+
+protected:
+	bool MatchesWidgetTag(const USInv_CompositeBase* Composite) const;
 };

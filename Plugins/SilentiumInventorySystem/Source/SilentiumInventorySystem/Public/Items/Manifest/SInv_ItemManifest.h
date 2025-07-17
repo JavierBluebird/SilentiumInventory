@@ -6,6 +6,7 @@
 #include "StructUtils/InstancedStruct.h"
 #include "SInv_ItemManifest.generated.h"
 
+class USInv_CompositeBase;
 struct FSInv_ItemFragment;
 /*--------------------------------------------------------------------------------------*/
 /*																					   */
@@ -14,6 +15,7 @@ struct FSInv_ItemFragment;
 /*----------------------------------------------------------------------------------*/
 class USInv_InventoryItem;
 struct FSInv_ItemFragment;
+class USInv_CompositeBase;
 
 enum class ESInv_ItemCategory : uint8;
 
@@ -38,7 +40,12 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
 	T* GetFragmentOfTypeMutable();
 
+	template<typename T> requires std::derived_from<T, FSInv_ItemFragment>
+	TArray<const T*> GetAllFragmentsOfType() const;
+	
 	void SpawnPickUpActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+
+	void AssimilateInventoryFragments(USInv_CompositeBase* Composite) const;
 	
 private:
 
@@ -102,4 +109,19 @@ T* FSInv_ItemManifest::GetFragmentOfTypeMutable()
 		}
 	}
 	return nullptr;
+}
+
+template <typename T>
+requires std::derived_from<T, FSInv_ItemFragment>
+TArray<const T*> FSInv_ItemManifest::GetAllFragmentsOfType() const
+{
+	TArray<const T*> Result;
+	for (const TInstancedStruct<FSInv_ItemFragment>& Fragment : Fragments)
+	{
+		if (const T* FragmentPtr = Fragment.GetPtr<T>())
+		{
+			Result.Add(FragmentPtr);
+		}
+	}
+	return Result;
 }

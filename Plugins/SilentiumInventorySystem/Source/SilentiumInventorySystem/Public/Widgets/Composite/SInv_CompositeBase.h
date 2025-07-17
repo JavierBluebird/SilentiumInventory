@@ -17,7 +17,7 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_CompositeBase : public UUserWidget
 
 public:
 
-	FGameplayTag GetGameplayTag() const {return FragmentTag ;}
+	FGameplayTag GetFragmentTag() const {return FragmentTag ;}
 	void SetGameplayTag(const FGameplayTag Tag) { FragmentTag = Tag; }
 
 	virtual void Collapse();

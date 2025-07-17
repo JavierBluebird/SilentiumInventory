@@ -11,6 +11,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/WidgetSwitcher.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
+#include "Items/SInv_InventoryItem.h"
 #include "Widgets/ItemDescription/SInv_ItemDescription.h"
 
 
@@ -85,14 +86,17 @@ FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemCo
 
 void USInv_SpatialInventory::OnItemHovered(USInv_InventoryItem* InventoryItem)
 {
+	const auto& Manifest = InventoryItem->GetItemManifest();
+	
 	USInv_ItemDescription* DescriptionWidget = GetItemDescription();
 	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer); // If it's active, deactivate first.
 	
 	FTimerDelegate DescriptionTimerDelegate;
-	DescriptionTimerDelegate.BindLambda([this]() // Defines the delegate functionality
+	DescriptionTimerDelegate.BindLambda([this, &Manifest,DescriptionWidget]() // Defines the delegate functionality
 		{
+			Manifest.AssimilateInventoryFragments(DescriptionWidget);
 			GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 	);

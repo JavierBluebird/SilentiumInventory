@@ -1,5 +1,20 @@
 ﻿#include "Items/Fragments/SInv_ItemFragment.h"
 
+#include "Widgets/Composite/SInv_CompositeBase.h"
+
+
+void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) const
+{
+	if (!MatchesWidgetTag(Composite)) return;
+	
+	Composite->Expand(); // Shows the Composite
+}
+
+bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
+{
+	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
+}
+
 void FSInv_HealthPotionFragment::OnConsume(APlayerController* PC)
 {
 	// Get a Stats Component from the PC or the PC->GetPawn()

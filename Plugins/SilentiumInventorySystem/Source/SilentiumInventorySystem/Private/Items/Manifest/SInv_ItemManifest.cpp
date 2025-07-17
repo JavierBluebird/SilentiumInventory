@@ -2,6 +2,8 @@
 
 #include "Items/SInv_InventoryItem.h"
 #include "Items/Components/SInv_ItemComponent.h"
+#include "Items/Fragments/SInv_ItemFragment.h"
+#include "Widgets/Composite/SInv_Composite.h"
 
 TObjectPtr<USInv_InventoryItem> FSInv_ItemManifest::Manifest(UObject* NewOuter)
 {
@@ -26,3 +28,17 @@ void FSInv_ItemManifest::SpawnPickUpActor(const UObject* WorldContextObject, con
 
 	ItemComponent->InitItemManifest(*this); // Pass by Value to copy this manifest into the newly spawned item's one
 }
+
+void FSInv_ItemManifest::AssimilateInventoryFragments(USInv_CompositeBase* Composite) const
+{
+	const auto& InventoryItemFragments = GetAllFragmentsOfType<FSInv_InventoryItemFragment>();
+
+	for (const auto* Fragment : InventoryItemFragments)
+	{
+		Composite->ApplyFunction([Fragment](USInv_CompositeBase* Widget)
+		{
+			Fragment->Assimilate(Widget);
+		});
+	}
+}
+
