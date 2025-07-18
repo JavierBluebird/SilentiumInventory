@@ -27,6 +27,9 @@ public:
 	FEquippedGridSlotClicked EquippedGridSlotClicked;
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "GameItems.Equipment"))
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "GameItems.Equipment", ToolTip = "Tag that indicates to what Equipment type this Slot belongs to."))
 	FGameplayTag EquipmentTypeTag;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> Image_GrayedOutIcon;
 };

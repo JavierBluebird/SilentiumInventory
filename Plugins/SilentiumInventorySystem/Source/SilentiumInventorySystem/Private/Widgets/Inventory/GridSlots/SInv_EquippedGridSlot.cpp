@@ -3,6 +3,7 @@
 
 #include "Widgets/Inventory/GridSlots/SInv_EquippedGridSlot.h"
 
+#include "Components/Image.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
 #include "Widgets/Inventory/HoverItem/SInv_HoverItem.h"
 
@@ -15,7 +16,8 @@ void USInv_EquippedGridSlot::NativeOnMouseEnter(const FGeometry& InGeometry, con
 
 	if (HoverItem->GetItemType().MatchesTag(EquipmentTypeTag)) // Partially matches hierarchy
 	{
-		SetOccupiedTexture();	
+		SetOccupiedTexture();
+		Image_GrayedOutIcon->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
@@ -28,7 +30,8 @@ void USInv_EquippedGridSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEven
 
 	if (HoverItem->GetItemType().MatchesTag(EquipmentTypeTag)) // Partially matches hierarchy
 	{
-		SetUnoccupiedTexture();	
+		SetUnoccupiedTexture();
+		Image_GrayedOutIcon->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
