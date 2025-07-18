@@ -52,6 +52,12 @@ struct FSInv_ItemFragment
 	/*----------------------------------------------------------------*/
 	FGameplayTag GetFragmentTag() const {return FragmentTag;}
 	void SetFragmentTag(FGameplayTag Tag) {FragmentTag = Tag;}
+
+	/*-----------------------------------------------------------------------.--*/
+	/*			virtual Function for Manifesting (Initialization)		 	   */
+	/*------------------------------------------------------------------------*/
+
+	virtual void Manifest() {}
 	
 	private:
 	
@@ -203,6 +209,50 @@ struct FSInv_TextFragment : public FSInv_InventoryItemFragment
 	void SetText(const FText& Text) { FragmentText = Text; }
 	
 private:
+	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	FText FragmentText;
+};
+
+/*------------------------------------------------*/
+/*				Labeled Number Fragment			  */
+/*------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_LabeledNumberFragment : public FSInv_InventoryItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Manifest() override;
+	
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+
+	// When Manifesting for the First Time, this fragment will randomize, however once equipped
+	// and dropped, an item should retain the same value, so randomization should not occur.
+	bool bRandomizeOnManifest {true};
+	
+private:
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	FText Text_Label;
+
+	UPROPERTY(VisibleAnywhere, Category = "Silentium Inventory")
+	float Value {0.f};
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	float Min {0.f};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	float Max {0.f};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	bool bCollapseLabel {false};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	bool bCollapseValue {false};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	int32 MinFractionalDigits {1};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	int32 MaxFractionalDigits {1};
 };

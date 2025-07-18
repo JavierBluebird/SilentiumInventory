@@ -24,6 +24,8 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 {
 	GENERATED_BODY()
 
+	TArray<TInstancedStruct<FSInv_ItemFragment>>& GetFragmentsMutable() { return Fragments; }
+	
 	TObjectPtr<USInv_InventoryItem> Manifest(UObject* NewOuter);
 	
 	// Category Getter
@@ -60,6 +62,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")
 	TSubclassOf<AActor> PickupActorClass;
+
+	void ClearFragments();
 };
 
 /*--------------------------------------------*/

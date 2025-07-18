@@ -28,6 +28,6 @@ public:
 	virtual void ApplyFunction(FuncType Function) {}
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "FragmentTags"))
 	FGameplayTag FragmentTag;
 };

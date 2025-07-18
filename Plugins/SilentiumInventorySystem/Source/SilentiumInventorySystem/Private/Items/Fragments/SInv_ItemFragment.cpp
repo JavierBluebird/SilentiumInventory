@@ -2,6 +2,7 @@
 
 #include "Widgets/Composite/SInv_CompositeBase.h"
 #include "Widgets/Composite/SInv_Leaf_Image.h"
+#include "Widgets/Composite/SInv_Leaf_LabeledValue.h"
 #include "Widgets/Composite/SInv_Leaf_Text.h"
 
 /*------------------------------------------*/
@@ -27,7 +28,6 @@ void FSInv_TextFragment::Assimilate(USInv_CompositeBase* Composite) const
 	LeafText->SetText(FragmentText);
 }
 
-
 void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
 	FSInv_InventoryItemFragment::Assimilate(Composite);
@@ -41,11 +41,51 @@ void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 	Image->SetImageSize(IconDimensions);
 }
 
+void FSInv_LabeledNumberFragment::Assimilate(USInv_CompositeBase* Composite) const
+{
+	FSInv_InventoryItemFragment::Assimilate(Composite);
+	if (!MatchesWidgetTag(Composite)) return;
+
+	USInv_Leaf_LabeledValue* LabeledValue = Cast<USInv_Leaf_LabeledValue>(Composite);
+	if (!IsValid(LabeledValue)) return;
+
+	LabeledValue->SetText_Label(Text_Label,bCollapseLabel);
+
+	FNumberFormattingOptions NumberOptions;
+	
+	NumberOptions.MinimumFractionalDigits = MinFractionalDigits;
+	NumberOptions.MaximumFractionalDigits = MaxFractionalDigits;
+	
+	LabeledValue->SetText_Value(FText::AsNumber(Value,&NumberOptions),bCollapseValue);
+}
+
 bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
 {
 	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
 }
 
+/*----------------------------------------------*/
+/*												*/
+/*		   Fragments Manifest Functions			*/
+/*												*/
+/*----------------------------------------------*/
+
+void FSInv_LabeledNumberFragment::Manifest()
+{
+	FSInv_InventoryItemFragment::Manifest();
+	
+		if (bRandomizeOnManifest)
+		{
+			Value = FMath::RandRange(Min,Max);
+		}
+		bRandomizeOnManifest = false;
+}
+
+/*----------------------------------------------*/
+/*												*/
+/*		   Fragments Specific Functions			*/
+/*												*/
+/*----------------------------------------------*/
 void FSInv_HealthPotionFragment::OnConsume(APlayerController* PC)
 {
 	// Get a Stats Component from the PC or the PC->GetPawn()

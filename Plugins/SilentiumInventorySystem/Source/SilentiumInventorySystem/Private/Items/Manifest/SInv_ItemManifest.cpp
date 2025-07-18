@@ -11,6 +11,14 @@ TObjectPtr<USInv_InventoryItem> FSInv_ItemManifest::Manifest(UObject* NewOuter)
 		USInv_InventoryItem::StaticClass());
 
 	Item->SetItemManifest(*this);
+	
+	for (auto& Fragment : Item->GetItemManifestMutable().GetFragmentsMutable())
+	{
+		Fragment.GetMutable().Manifest();
+	}
+	
+	ClearFragments(); // cleans for unnecessary references stored.
+	
 	return Item;
 }
 
@@ -40,5 +48,14 @@ void FSInv_ItemManifest::AssimilateInventoryFragments(USInv_CompositeBase* Compo
 			Fragment->Assimilate(Widget);
 		});
 	}
+}
+
+void FSInv_ItemManifest::ClearFragments()
+{
+	for (auto& Fragment : Fragments)
+	{
+		Fragment.Reset();
+	}
+	Fragments.Empty();
 }
 
