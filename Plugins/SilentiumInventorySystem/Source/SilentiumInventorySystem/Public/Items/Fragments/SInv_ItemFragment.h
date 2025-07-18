@@ -88,19 +88,40 @@ struct FSInv_GridFragment : public FSInv_ItemFragment
 	float GridPadding {0.f};
 };
 
+/*--------------------------------------------------------*/
+/*														  */
+/*				Inventory Item Fragment					  */
+/*		Specific for Assimilation within a Widget		  */
+/*														  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_InventoryItemFragment : public FSInv_ItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Assimilate(USInv_CompositeBase* Composite) const;
+
+protected:
+	bool MatchesWidgetTag(const USInv_CompositeBase* Composite) const;
+};
+
 /*------------------------------------------------*/
 /*					Image Fragment			 	  */
 /*------------------------------------------------*/
 USTRUCT(BlueprintType)
-struct FSInv_ImageFragment : public FSInv_ItemFragment
+struct FSInv_ImageFragment : public FSInv_InventoryItemFragment
 {
 	GENERATED_BODY()
 
 	UTexture2D* GetItemIcon() const { return ItemIcon; }
+	
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+	
 	void SetItemIcon(UTexture2D* Icon) { ItemIcon = Icon; }
 
 	FVector2D GetIconDimension() const { return IconDimensions; }
 	void SetIconDimensions(const FVector2D& Dimensions) { IconDimensions = Dimensions; }
+
 	
 	private:
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
@@ -167,21 +188,4 @@ struct FSInv_ManaPotionFragment : public FSInv_ConsumableFragment
 	float ManaAmount {20.f};
 	
 	virtual void OnConsume(APlayerController* PC) override;
-};
-
-/*--------------------------------------------------------*/
-/*														  */
-/*				Inventory Item Fragment					  */
-/*		Specific for Assimilation within a Widget		  */
-/*														  */
-/*--------------------------------------------------------*/
-USTRUCT(BlueprintType)
-struct FSInv_InventoryItemFragment : public FSInv_ItemFragment
-{
-	GENERATED_BODY()
-
-	virtual void Assimilate(USInv_CompositeBase* Composite) const;
-
-protected:
-	bool MatchesWidgetTag(const USInv_CompositeBase* Composite) const;
 };
