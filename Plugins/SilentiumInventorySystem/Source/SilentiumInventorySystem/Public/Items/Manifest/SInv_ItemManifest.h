@@ -51,7 +51,7 @@ struct SILENTIUMINVENTORYSYSTEM_API FSInv_ItemManifest
 	
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties", meta = (ExcludeBaseStruct))
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties", meta = (ExcludeBaseStruct, ToolTip = "Add Fragments for Item Characteristics and Features, such as Consumable, Grid Size, Icon, Required Level, Sell Value, etc."))
 	TArray<TInstancedStruct<FSInv_ItemFragment>> Fragments;
 	
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory|Item Properties")

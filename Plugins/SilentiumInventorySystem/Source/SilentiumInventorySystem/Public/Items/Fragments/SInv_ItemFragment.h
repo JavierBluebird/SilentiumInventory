@@ -159,28 +159,28 @@ struct FSInv_LabeledNumberFragment : public FSInv_InventoryItemFragment
 	
 private:
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Name of the value."))
 	FText Text_Label;
 
-	UPROPERTY(VisibleAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(VisibleAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Actual Value."))
 	float Value {0.f};
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "If Randomizing, the minimum amount to random from. If Randomizing isn't needed, make it the same value as Max"))
 	float Min {0.f};
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "If Randomizing, the max amount to random. If Randomizing isn't needed, make it the same value as Min"))
 	float Max {0.f};
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Set to true if the Label should be collapsed."))
 	bool bCollapseLabel {false};
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Set to true if the Value should be collapsed."))
 	bool bCollapseValue {false};
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Minimum amount of Fractional Digits to show, set to 0 if you don't want fractional digits."))
 	int32 MinFractionalDigits {1};
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Maximum amount of Fractional Digits to show, set to 0 if you don't want fractional digits."))
 	int32 MaxFractionalDigits {1};
 };
 
@@ -232,7 +232,7 @@ struct FSInv_ConsumableFragment : public FSInv_InventoryItemFragment
 
 	private:
 	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ExcludeBaseStruct))
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ExcludeBaseStruct), meta = (ToolTip = "Array of Consume Modifiers. Add to customize Consumable Mechanics or Features."))
 	TArray<TInstancedStruct<FSInv_ConsumeModifier>> ConsumeModifiers;
 };
 

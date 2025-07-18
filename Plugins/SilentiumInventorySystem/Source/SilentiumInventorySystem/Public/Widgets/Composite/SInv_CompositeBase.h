@@ -28,6 +28,6 @@ public:
 	virtual void ApplyFunction(FuncType Function) {}
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "FragmentTags"))
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (Categories = "FragmentTags", ToolTip = "This tag must match Item's Fragment Tag in order to show the property on the Widget."))
 	FGameplayTag FragmentTag;
 };
