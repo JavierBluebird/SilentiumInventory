@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "IAutomationReport.h"
+#include "StructUtils/InstancedStruct.h"
 #include "Types/AttributeStorage.h"
 #include "SInv_ItemFragment.generated.h"
 
@@ -138,83 +139,6 @@ struct FSInv_ImageFragment : public FSInv_InventoryItemFragment
 };
 
 /*------------------------------------------------*/
-/*				Stackable Fragment			 	  */
-/*------------------------------------------------*/
-USTRUCT(BlueprintType)
-struct FSInv_StackableFragment : public FSInv_ItemFragment
-{
-	GENERATED_BODY()
-	
-	int32 GetMaxStackSize() const { return MaxStackSize; }
-	int32 GetStackCount() const { return StackCount; }
-	void SetStackCount(int32 Count) { StackCount = Count; }
-	
-private:
-
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Max amount of items the Stack can hold per Slot."))
-	int32 MaxStackSize {1};
-
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Amount of items we will get on the Stack when Item gets picked up."))
-	int32 StackCount {1};
-};
-
-/*---------------------------------------------------------*/
-/*														  */
-/*				Base Consumable Fragment			 	  */
-/*														  */
-/*--------------------------------------------------------*/
-USTRUCT(BlueprintType)
-struct FSInv_ConsumableFragment : public FSInv_ItemFragment
-{
-	GENERATED_BODY()
-
-	virtual void OnConsume(APlayerController* PC) {}
-};
-
-/*---------------------------------------------------------*/
-/*				Consumable Child Fragments			 	  */
-/*--------------------------------------------------------*/
-USTRUCT(BlueprintType)
-struct FSInv_HealthPotionFragment : public FSInv_ConsumableFragment
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
-	float HealAmount {20.f};
-	
-	virtual void OnConsume(APlayerController* PC) override;
-};
-
-USTRUCT(BlueprintType)
-struct FSInv_ManaPotionFragment : public FSInv_ConsumableFragment
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
-	float ManaAmount {20.f};
-	
-	virtual void OnConsume(APlayerController* PC) override;
-};
-/*------------------------------------------------*/
-/*					Text Fragment			 	  */
-/*------------------------------------------------*/
-USTRUCT(BlueprintType)
-struct FSInv_TextFragment : public FSInv_InventoryItemFragment
-{
-	GENERATED_BODY()
-	
-	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
-
-	FText GetText() const { return FragmentText; }
-	void SetText(const FText& Text) { FragmentText = Text; }
-	
-private:
-	
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
-	FText FragmentText;
-};
-
-/*------------------------------------------------*/
 /*				Labeled Number Fragment			  */
 /*------------------------------------------------*/
 USTRUCT(BlueprintType)
@@ -229,6 +153,9 @@ struct FSInv_LabeledNumberFragment : public FSInv_InventoryItemFragment
 	// When Manifesting for the First Time, this fragment will randomize, however once equipped
 	// and dropped, an item should retain the same value, so randomization should not occur.
 	bool bRandomizeOnManifest {true};
+
+	float GetValue() const { return Value; }
+	FText GetTextLabel() const { return Text_Label;}
 	
 private:
 	
@@ -256,3 +183,95 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
 	int32 MaxFractionalDigits {1};
 };
+
+/*------------------------------------------------*/
+/*				Stackable Fragment			 	  */
+/*------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_StackableFragment : public FSInv_ItemFragment
+{
+	GENERATED_BODY()
+	
+	int32 GetMaxStackSize() const { return MaxStackSize; }
+	int32 GetStackCount() const { return StackCount; }
+	void SetStackCount(int32 Count) { StackCount = Count; }
+	
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Max amount of items the Stack can hold per Slot."))
+	int32 MaxStackSize {1};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Amount of items we will get on the Stack when Item gets picked up."))
+	int32 StackCount {1};
+};
+/*---------------------------------------------------------*/
+/*			Consumable Modifiers Sub-Fragments			  */
+/*--------------------------------------------------------*/
+
+USTRUCT(BlueprintType)
+struct FSInv_ConsumeModifier : public FSInv_LabeledNumberFragment
+{
+	GENERATED_BODY()
+
+	virtual void OnConsume(APlayerController* PC) {}
+};
+/*---------------------------------------------------------*/
+/*														  */
+/*				Base Consumable Fragment			 	  */
+/*														  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_ConsumableFragment : public FSInv_InventoryItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+	
+	virtual void OnConsume(APlayerController* PC);
+	virtual void Manifest() override;
+
+	private:
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FSInv_ConsumeModifier>> ConsumeModifiers;
+};
+
+
+/*---------------------------------------------------------*/
+/*				Consumable Child Fragments			 	  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_HealthPotionFragment : public FSInv_ConsumeModifier
+{
+	GENERATED_BODY()
+	
+	virtual void OnConsume(APlayerController* PC) override;
+};
+
+USTRUCT(BlueprintType)
+struct FSInv_ManaPotionFragment : public FSInv_ConsumeModifier
+{
+	GENERATED_BODY()
+	
+	virtual void OnConsume(APlayerController* PC) override;
+};
+
+/*------------------------------------------------*/
+/*					Text Fragment			 	  */
+/*------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_TextFragment : public FSInv_InventoryItemFragment
+{
+	GENERATED_BODY()
+	
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+
+	FText GetText() const { return FragmentText; }
+	void SetText(const FText& Text) { FragmentText = Text; }
+	
+private:
+	
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	FText FragmentText;
+};
+

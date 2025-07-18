@@ -59,6 +59,17 @@ void FSInv_LabeledNumberFragment::Assimilate(USInv_CompositeBase* Composite) con
 	LabeledValue->SetText_Value(FText::AsNumber(Value,&NumberOptions),bCollapseValue);
 }
 
+void FSInv_ConsumableFragment::Assimilate(USInv_CompositeBase* Composite) const
+{
+	FSInv_InventoryItemFragment::Assimilate(Composite);
+
+	for (const auto& Modifier : ConsumeModifiers)
+	{
+		const auto& ModRef = Modifier.Get();
+		ModRef.Assimilate(Composite);
+	}
+}
+
 bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
 {
 	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
@@ -86,13 +97,33 @@ void FSInv_LabeledNumberFragment::Manifest()
 /*		   Fragments Specific Functions			*/
 /*												*/
 /*----------------------------------------------*/
+void FSInv_ConsumableFragment::OnConsume(APlayerController* PC)
+{
+	for (auto& Modifier : ConsumeModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.OnConsume(PC);
+	}
+}
+
+void FSInv_ConsumableFragment::Manifest()
+{
+	FSInv_InventoryItemFragment::Manifest();
+	for (auto& Modifier : ConsumeModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.Manifest();
+	}
+}
+
 void FSInv_HealthPotionFragment::OnConsume(APlayerController* PC)
 {
 	// Get a Stats Component from the PC or the PC->GetPawn()
 	// or get the Ability System Component and apply a Gameplay Effect
 	// or call an Interface Function for Healing(), etc.
 
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f, FColor::Emerald, FString::Printf(TEXT("Health Potion Consumed! Healing by: %f"), HealAmount));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f, FColor::Emerald, FString::Printf(
+		TEXT("Health Potion Consumed! Healing by: %f"), GetValue()));
 }
 
 void FSInv_ManaPotionFragment::OnConsume(APlayerController* PC)
@@ -100,6 +131,6 @@ void FSInv_ManaPotionFragment::OnConsume(APlayerController* PC)
 	// Get a Stats Component from the PC or the PC->GetPawn()
 	// or get the Ability System Component and apply a Gameplay Effect
 	// or call an Interface Function for HealingMana(), etc.
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f, FColor::Emerald, FString::Printf(TEXT("Mana Potion Consumed! Mana Recovered by: %f"), ManaAmount));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f, FColor::Emerald, FString::Printf(TEXT("Mana Potion Consumed! Mana Recovered by: %f"), GetValue()));
 }
 

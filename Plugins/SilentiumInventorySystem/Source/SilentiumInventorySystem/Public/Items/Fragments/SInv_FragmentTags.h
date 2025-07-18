@@ -11,4 +11,11 @@ namespace FragmentTags
 	
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(ItemNameFragment)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(PrimaryStatFragment)
+
+	namespace StatModifier
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(StatModifier_1)
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(StatModifier_2)
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(StatModifier_3)
+	}
 }
