@@ -1,6 +1,7 @@
 ﻿#include "Items/Fragments/SInv_ItemFragment.h"
 
 #include "Widgets/Composite/SInv_CompositeBase.h"
+#include "Widgets/Composite/SInv_Leaf_Image.h"
 
 
 void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) const
@@ -13,6 +14,19 @@ void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) con
 bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
 {
 	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
+}
+
+void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
+{
+	FSInv_InventoryItemFragment::Assimilate(Composite);
+	if (!MatchesWidgetTag(Composite)) return;
+
+	USInv_Leaf_Image* Image = Cast<USInv_Leaf_Image>(Composite);
+	if (!IsValid(Image)) return;
+
+	Image->SetImage(ItemIcon);
+	Image->SetBoxSize(IconDimensions);
+	Image->SetImageSize(IconDimensions);
 }
 
 void FSInv_HealthPotionFragment::OnConsume(APlayerController* PC)

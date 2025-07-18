@@ -11,7 +11,7 @@ void USInv_Composite::NativeOnInitialized()
 
 	WidgetTree->ForEachWidget([this](UWidget* Widget)
 		{	// We are only interested in those inside a Composite hierarchy.
-			if (USInv_CompositeBase* Composite = Cast<USInv_Composite>(Widget); IsValid(Composite))
+			if (USInv_CompositeBase* Composite = Cast<USInv_CompositeBase>(Widget); IsValid(Composite))
 			{
 				Children.Add(Composite);
 				Composite->Collapse();
