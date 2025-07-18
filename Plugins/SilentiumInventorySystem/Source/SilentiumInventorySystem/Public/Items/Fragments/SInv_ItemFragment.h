@@ -189,3 +189,20 @@ struct FSInv_ManaPotionFragment : public FSInv_ConsumableFragment
 	
 	virtual void OnConsume(APlayerController* PC) override;
 };
+/*------------------------------------------------*/
+/*					Text Fragment			 	  */
+/*------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_TextFragment : public FSInv_InventoryItemFragment
+{
+	GENERATED_BODY()
+	
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+
+	FText GetText() const { return FragmentText; }
+	void SetText(const FText& Text) { FragmentText = Text; }
+	
+private:
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	FText FragmentText;
+};

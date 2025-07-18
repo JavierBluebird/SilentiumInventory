@@ -2,8 +2,13 @@
 
 #include "Widgets/Composite/SInv_CompositeBase.h"
 #include "Widgets/Composite/SInv_Leaf_Image.h"
+#include "Widgets/Composite/SInv_Leaf_Text.h"
 
-
+/*------------------------------------------*/
+/*											*/
+/*		   Fragments Assimilations			*/
+/*											*/
+/*------------------------------------------*/
 void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
 	if (!MatchesWidgetTag(Composite)) return;
@@ -11,10 +16,17 @@ void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) con
 	Composite->Expand(); // Shows the Composite
 }
 
-bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
+void FSInv_TextFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
-	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
+	FSInv_InventoryItemFragment::Assimilate(Composite);
+
+	if (!MatchesWidgetTag(Composite)) return;
+	USInv_Leaf_Text* LeafText = Cast<USInv_Leaf_Text>(Composite);
+	if (!LeafText) return;
+
+	LeafText->SetText(FragmentText);
 }
+
 
 void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
@@ -27,6 +39,11 @@ void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 	Image->SetImage(ItemIcon);
 	Image->SetBoxSize(IconDimensions);
 	Image->SetImageSize(IconDimensions);
+}
+
+bool FSInv_InventoryItemFragment::MatchesWidgetTag(const USInv_CompositeBase* Composite) const
+{
+	return Composite->GetFragmentTag().MatchesTagExact(GetFragmentTag());
 }
 
 void FSInv_HealthPotionFragment::OnConsume(APlayerController* PC)
@@ -45,3 +62,4 @@ void FSInv_ManaPotionFragment::OnConsume(APlayerController* PC)
 	// or call an Interface Function for HealingMana(), etc.
 	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f, FColor::Emerald, FString::Printf(TEXT("Mana Potion Consumed! Mana Recovered by: %f"), ManaAmount));
 }
+
