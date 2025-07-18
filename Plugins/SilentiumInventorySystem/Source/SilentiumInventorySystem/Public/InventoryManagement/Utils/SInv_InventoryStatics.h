@@ -8,6 +8,7 @@
 #include "UObject/Object.h"
 #include "SInv_InventoryStatics.generated.h"
 
+class USInv_HoverItem;
 class USInv_InventoryComponent;
 struct FSInv_ItemManifest;
 class USInv_ItemComponent;
@@ -35,6 +36,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
 	static void ItemUnhovered(APlayerController* PC);
+	
+	UFUNCTION(BlueprintCallable, Category = "SilentiumInventory")
+	static USInv_HoverItem* GetHoveredItem(APlayerController* PC);
 };
 
 /*---------------------------------*/

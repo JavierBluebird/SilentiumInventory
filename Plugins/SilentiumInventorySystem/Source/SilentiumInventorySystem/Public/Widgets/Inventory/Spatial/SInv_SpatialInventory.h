@@ -7,6 +7,8 @@
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 #include "SInv_SpatialInventory.generated.h"
 
+struct FGameplayTag;
+class USInv_EquippedGridSlot;
 class USInv_ItemDescription;
 class UCanvasPanel;
 class UButton;
@@ -33,9 +35,14 @@ public:
 	virtual void OnItemHovered(USInv_InventoryItem* InventoryItem) override;
 	virtual bool HasHoverItem() const override;
 	virtual void OnItemUnhovered() override;
+
+	virtual USInv_HoverItem* GetHoverItem() const override;
 	
 private:
 
+	UPROPERTY()
+	TArray<TObjectPtr<USInv_EquippedGridSlot>> EquippedGridSlots;
+	
 	// In Case of Extending the inventory system, we must add the Type in SInv_GridTypes.h
 	// then create the Grid TObjectPtr, its button and the callback function bound
 	// in NativeOnInitialized.
@@ -102,6 +109,9 @@ private:
 
 	UFUNCTION()
 	void ShowCraftables();
+
+	UFUNCTION()
+	void EquippedGridSlotClicked(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
 	
 	// --------------------//
 	//	 Helper Functions //

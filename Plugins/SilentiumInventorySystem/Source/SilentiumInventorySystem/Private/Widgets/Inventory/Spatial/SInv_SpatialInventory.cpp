@@ -5,6 +5,7 @@
 
 #include "SilentiumInventorySystem.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "Blueprint/WidgetTree.h"
 #include "Widgets/Inventory/Spatial/SInv_InventoryGrid.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -12,6 +13,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
 #include "Items/SInv_InventoryItem.h"
+#include "Widgets/Inventory/GridSlots/SInv_EquippedGridSlot.h"
 #include "Widgets/ItemDescription/SInv_ItemDescription.h"
 
 
@@ -31,6 +33,22 @@ void USInv_SpatialInventory::NativeOnInitialized()
 	Grid_Craftables->SetOwningCanvas(CanvasPanel);
 	
 	ShowEquippables();
+
+	// Iterate over every widget child to find the ones we are looking for.
+	WidgetTree->ForEachWidget([this](UWidget* Widget)
+	{
+		USInv_EquippedGridSlot* EquippedGridSlot = Cast<USInv_EquippedGridSlot>(Widget);
+		if (IsValid(EquippedGridSlot))
+			{
+				EquippedGridSlots.Add(EquippedGridSlot);
+				EquippedGridSlot->EquippedGridSlotClicked.AddDynamic(this, &ThisClass::EquippedGridSlotClicked);
+			}
+	});
+}
+
+void USInv_SpatialInventory::EquippedGridSlotClicked(USInv_EquippedGridSlot* EquippedGridSlot,
+	const FGameplayTag& EquipmentTypeTag)
+{
 }
 
 FReply USInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -112,6 +130,13 @@ void USInv_SpatialInventory::OnItemUnhovered()
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer);
 }
 
+USInv_HoverItem* USInv_SpatialInventory::GetHoverItem() const
+{
+	if (!ActiveGrid.IsValid()) return nullptr;
+
+	return ActiveGrid->GetHoverItem();
+}
+
 bool USInv_SpatialInventory::HasHoverItem() const
 {
 	if (Grid_Equippables->HasHoverItem()) return true;
@@ -145,6 +170,7 @@ void USInv_SpatialInventory::ShowCraftables()
 {
 	SetActiveGrid(Grid_Craftables, Button_Craftables);
 }
+
 
 void USInv_SpatialInventory::SetActiveGrid(USInv_InventoryGrid* Grid, UButton* Button)
 {

@@ -48,6 +48,7 @@ public:
 	void SetOwningCanvas(UCanvasPanel* OwningCanvas);
 	void DropItem();
 	bool HasHoverItem() const;
+	USInv_HoverItem* GetHoverItem() const;
 	
 private:
 

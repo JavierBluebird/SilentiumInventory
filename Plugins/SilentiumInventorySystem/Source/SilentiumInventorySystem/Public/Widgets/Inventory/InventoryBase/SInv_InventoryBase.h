@@ -8,6 +8,7 @@
 #include "SInv_InventoryBase.generated.h"
 
 
+class USInv_HoverItem;
 class USInv_ItemComponent;
 class USInv_InventoryItem;
 
@@ -22,4 +23,5 @@ public:
 	virtual void OnItemHovered(USInv_InventoryItem* InventoryItem) { }
 	virtual void OnItemUnhovered() { }
 	virtual bool HasHoverItem() const { return false; }
+	virtual USInv_HoverItem* GetHoverItem() const { return nullptr; }
 };
