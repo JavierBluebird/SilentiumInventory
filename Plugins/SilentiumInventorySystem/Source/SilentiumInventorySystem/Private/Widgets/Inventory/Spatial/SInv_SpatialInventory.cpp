@@ -83,7 +83,57 @@ void USInv_SpatialInventory::EquippedGridSlotClicked(USInv_EquippedGridSlot* Equ
 
 void USInv_SpatialInventory::EquippedSlottedItemClicked(USInv_EquippedSlottedItem* SlottedItem)
 {
+	// Remove the Item Description
+	USInv_InventoryStatics::ItemUnhovered(GetOwningPlayer());
+
+	if (IsValid(GetHoverItem()) && GetHoverItem()->IsStackable()) return;
+	// Get Item to Equip
+	USInv_InventoryItem* ItemToEquip = IsValid(GetHoverItem()) ? GetHoverItem()->GetInventoryItem() : nullptr;
 	
+	// Get Item to Unequip
+	USInv_InventoryItem* ItemToUnequip = SlottedItem->GetInventoryItem();
+	
+	// Get the Equipped Grid Slot holding this Item.
+	USInv_EquippedGridSlot* EquippedGridSlot = FindSlotWithEquippedItem(ItemToUnequip);
+	
+	// Clear the slot of this item. (Set it's inventory Item to nullptr)
+	ClearSlotOfItem(EquippedGridSlot);
+	
+	// Assign previously Equipped Item as the Hover Item
+	Grid_Equippables->AssignHoverItem(ItemToUnequip);
+	
+	// Remove of the equipped slotted item from the equipped grid slot
+	RemoveEquippedSlottedItem(SlottedItem);
+	
+	// Make a new equipped slotted item (for the item we held in HoverItem)
+	// Broadcast delegates for OnItemEquipped / OnItemUnequipped (from the IC)
+}
+
+USInv_EquippedGridSlot* USInv_SpatialInventory::FindSlotWithEquippedItem(USInv_InventoryItem* EquippedItem) const
+{
+	auto* FoundEquippedGridSlot = EquippedGridSlots.FindByPredicate([EquippedItem](const USInv_EquippedGridSlot* GridSlot)
+	{
+		return GridSlot->GetInventoryItem() == EquippedItem;
+	});
+	return FoundEquippedGridSlot ? *FoundEquippedGridSlot : nullptr;
+}
+void USInv_SpatialInventory::RemoveEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem)
+{
+	if (!IsValid(EquippedSlottedItem)) return;
+
+	if (EquippedSlottedItem->OnEquippedSlottedItemClicked.IsAlreadyBound(this, &ThisClass::EquippedSlottedItemClicked))
+	{
+		EquippedSlottedItem->OnEquippedSlottedItemClicked.RemoveDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+	}
+	EquippedSlottedItem->RemoveFromParent();
+}
+void USInv_SpatialInventory::ClearSlotOfItem(USInv_EquippedGridSlot* EquippedGridSlot)
+{
+	if (IsValid(EquippedGridSlot))
+	{
+		EquippedGridSlot->SetEquippedSlottedItem(nullptr);
+		EquippedGridSlot->SetInventoryItem(nullptr);
+	}
 }
 
 bool USInv_SpatialInventory::CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot,
@@ -102,6 +152,7 @@ bool USInv_SpatialInventory::CanEquipHoverItem(USInv_EquippedGridSlot* EquippedG
 			&& HeldItem->GetItemManifest().GetItemCategory() == ESInv_ItemCategory::Equippable
 			&&HeldItem->GetItemManifest().GetItemType().MatchesTag(EquipmentTypeTag);
 }
+
 
 FReply USInv_SpatialInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {

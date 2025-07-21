@@ -118,13 +118,17 @@ private:
 	UFUNCTION()
 	void EquippedSlottedItemClicked(USInv_EquippedSlottedItem* SlottedItem);
 	
-	bool CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag ) const; 
+	bool CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag ) const;
+	USInv_EquippedGridSlot* FindSlotWithEquippedItem(USInv_InventoryItem* EquippedItem) const;
+	void ClearSlotOfItem(USInv_EquippedGridSlot* EquippedGridSlot);
+	void RemoveEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem);
 	// --------------------//
 	//	 Helper Functions //
 	// -------------------//
 
 	void SetActiveGrid(USInv_InventoryGrid* Grid, UButton* Button);
 	void DisableButton(UButton* Button);
-
 	TWeakObjectPtr<USInv_InventoryGrid> ActiveGrid;
+
 };
+
