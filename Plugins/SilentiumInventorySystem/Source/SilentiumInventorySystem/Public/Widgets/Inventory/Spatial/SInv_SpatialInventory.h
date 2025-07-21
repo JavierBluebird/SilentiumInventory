@@ -112,7 +112,8 @@ private:
 
 	UFUNCTION()
 	void EquippedGridSlotClicked(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
-	
+
+	bool CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag ) const; 
 	// --------------------//
 	//	 Helper Functions //
 	// -------------------//
