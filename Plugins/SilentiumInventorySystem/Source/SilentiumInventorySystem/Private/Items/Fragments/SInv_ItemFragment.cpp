@@ -28,6 +28,62 @@ void FSInv_TextFragment::Assimilate(USInv_CompositeBase* Composite) const
 	LeafText->SetText(FragmentText);
 }
 
+void FSInv_EquipmentFragment::Assimilate(USInv_CompositeBase* Composite) const
+{
+	FSInv_InventoryItemFragment::Assimilate(Composite);
+	for (const auto& Modifier : EquipModifiers)
+	{
+		const auto& ModRef = Modifier.Get();
+		ModRef.Assimilate(Composite);
+	}
+}
+
+/*------------------------------------------------------*/
+/*		Base Equipment Fragment Composite Functions		*/
+/*------------------------------------------------------*/
+void FSInv_EquipmentFragment::OnEquip(APlayerController* PC)
+{
+	if (bEquipped) return;
+	bEquipped = true;
+	
+	for (auto& Modifier : EquipModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.OnEquip(PC);
+	}
+}
+void FSInv_EquipmentFragment::OnUnequip(APlayerController* PC)
+{
+	if (!bEquipped) return;
+	bEquipped = false;
+	for (auto& Modifier : EquipModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.OnUnequip(PC);
+	}
+}
+
+/*-----------------------------------------------------------*/
+/*		Equip Modifier Fragments Composite Functions		*/
+/*--------------------------------------------------....----*/
+void FSInv_StrengthModifier::OnEquip(APlayerController* PC)
+{
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f,
+										  FColor::Emerald,
+										  FString::Printf(
+											TEXT("Strength increased by: %f"),
+											GetValue()));
+}
+
+void FSInv_StrengthModifier::OnUnequip(APlayerController* PC)
+{
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f,
+										  FColor::Emerald,
+										  FString::Printf(
+											TEXT("Item Unequipped. Strength decreased by: %f"),
+											GetValue()));
+}
+
 void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
 	FSInv_InventoryItemFragment::Assimilate(Composite);

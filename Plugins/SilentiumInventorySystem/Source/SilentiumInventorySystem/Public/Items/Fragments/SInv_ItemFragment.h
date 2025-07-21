@@ -275,3 +275,52 @@ private:
 	FText FragmentText;
 };
 
+
+/*---------------------------------------------------------*/
+/*														  */
+/*					Equipment Fragments	 		 	      */
+/*														  */
+/*--------------------------------------------------------*/
+
+/*-----------------------------------------------------------------*/
+/*				Base Equipment Modifier Fragment			 	  */
+/*----------------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_EquipModifier : public FSInv_LabeledNumberFragment
+{
+	GENERATED_BODY()
+
+	virtual void OnEquip(APlayerController* PC) {}
+	virtual void OnUnequip(APlayerController* PC) {}
+};
+
+/*-----------------------------------------------------------------*/
+/*				Equipment Stats Modifier Fragments			 	  */
+/*----------------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_StrengthModifier : public FSInv_EquipModifier
+{
+	GENERATED_BODY()
+
+	virtual void OnEquip(APlayerController* PC) override;
+	virtual void OnUnequip(APlayerController* PC) override;
+};
+
+/*---------------------------------------------------------*/
+/*				 Base Equipment Fragment			 	  */
+/*--------------------------------------------------------*/
+USTRUCT(BlueprintType)
+struct FSInv_EquipmentFragment : public FSInv_InventoryItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Assimilate(USInv_CompositeBase* Composite) const override;
+	bool bEquipped {false};
+	void OnEquip(APlayerController* PC);
+	void OnUnequip(APlayerController* PC);
+	
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TArray<TInstancedStruct<FSInv_EquipModifier>> EquipModifiers;
+};
