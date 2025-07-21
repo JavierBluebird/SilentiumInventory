@@ -17,6 +17,8 @@ class USInv_InventoryBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChanged, USInv_InventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSInv_SlotAvailabilityResult&, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged, USInv_InventoryItem*, Item);
+
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class SILENTIUMINVENTORYSYSTEM_API USInv_InventoryComponent : public UActorComponent
@@ -49,6 +51,12 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void Server_ConsumeItem(USInv_InventoryItem* Item);
+
+	UFUNCTION(Server,Reliable)
+	void Server_EquipSlotClicked(USInv_InventoryItem* ItemToEquip, USInv_InventoryItem* ItemToUnequip);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Multicast_EquipSlotClicked(USInv_InventoryItem* ItemToEquip, USInv_InventoryItem* ItemToUnequip);
 	
 	/*-------------------------------*/
 	/*		Inventory Delegates		 */
@@ -57,10 +65,11 @@ public:
 	FInventoryItemChanged OnItemRemoved;
 	FNoRoomInInventory NoRoomInInventory;
 	FStackChange OnStackChange;
+	FItemEquipStatusChanged OnItemEquipped;
+	FItemEquipStatusChanged OnItemUnequipped;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-	
 protected:
 	virtual void BeginPlay() override;
 

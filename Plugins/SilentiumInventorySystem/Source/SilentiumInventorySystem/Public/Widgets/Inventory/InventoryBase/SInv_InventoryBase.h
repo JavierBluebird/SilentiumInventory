@@ -24,4 +24,5 @@ public:
 	virtual void OnItemUnhovered() { }
 	virtual bool HasHoverItem() const { return false; }
 	virtual USInv_HoverItem* GetHoverItem() const { return nullptr; }
+	virtual float GetSlotSize() const { return 0.0f; }
 };

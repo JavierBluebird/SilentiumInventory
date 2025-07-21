@@ -49,6 +49,10 @@ public:
 	void DropItem();
 	bool HasHoverItem() const;
 	USInv_HoverItem* GetHoverItem() const;
+	float GetSlotSize() const { return SlotSize; };
+
+	void ClearHoveredItem();
+
 	
 private:
 
@@ -184,7 +188,6 @@ private:
 	void UnHighlightSlots(const int32 Index, const FIntPoint& Dimensions);
 	void ChangeHoverType(const int32 Index, const FIntPoint& Dimensions, ESInv_GridSlotsState GridSlotState);
 	void PutDownOnIndex(const int32 Index);
-	void ClearHoveredItem();
 
 	/*----------------------------------*/
 	/*	  Cursor Widgets Variables	    */

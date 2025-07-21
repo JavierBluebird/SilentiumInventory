@@ -217,6 +217,20 @@ void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemC
 	}
 }
 
+void USInv_InventoryComponent::Server_EquipSlotClicked_Implementation(USInv_InventoryItem* ItemToEquip,
+	USInv_InventoryItem* ItemToUnequip)
+{
+	Multicast_EquipSlotClicked(ItemToEquip, ItemToUnequip);
+}
+
+void USInv_InventoryComponent::Multicast_EquipSlotClicked_Implementation(USInv_InventoryItem* ItemToEquip,
+	USInv_InventoryItem* ItemToUnequip)
+{
+	// Equipment Component will listen to these delegates.
+	OnItemEquipped.Broadcast(ItemToEquip);
+	OnItemUnequipped.Broadcast(ItemToUnequip);
+}
+
 void USInv_InventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

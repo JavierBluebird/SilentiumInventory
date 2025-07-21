@@ -11,9 +11,11 @@
  * 
  */
 
+class UOverlay;
+class USInv_EquippedSlottedItem;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquippedGridSlotClicked,
-											 USInv_EquippedGridSlot*, GridSlot,
-											 const FGameplayTag&, EquipmentTypeTag);
+                                             USInv_EquippedGridSlot*, GridSlot,
+                                             const FGameplayTag&, EquipmentTypeTag);
 UCLASS()
 class SILENTIUMINVENTORYSYSTEM_API USInv_EquippedGridSlot : public USInv_GridSlot
 {
@@ -24,6 +26,8 @@ public:
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+	USInv_EquippedSlottedItem* OnItemEquipped(USInv_InventoryItem* Item, const FGameplayTag& EquipmentTag, float SlotSize);
+
 	FEquippedGridSlotClicked EquippedGridSlotClicked;
 private:
 
@@ -32,4 +36,13 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> Image_GrayedOutIcon;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TSubclassOf<USInv_EquippedSlottedItem> EquippedSlottedItemClass;
+
+	UPROPERTY()
+	TObjectPtr<USInv_EquippedSlottedItem> EquippedSlottedItem;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> Overlay_Root;
 };

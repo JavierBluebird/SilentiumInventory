@@ -7,6 +7,7 @@
 #include "Widgets/Inventory/InventoryBase/SInv_InventoryBase.h"
 #include "SInv_SpatialInventory.generated.h"
 
+class USInv_EquippedSlottedItem;
 struct FGameplayTag;
 class USInv_EquippedGridSlot;
 class USInv_ItemDescription;
@@ -37,6 +38,7 @@ public:
 	virtual void OnItemUnhovered() override;
 
 	virtual USInv_HoverItem* GetHoverItem() const override;
+	virtual float GetSlotSize() const override;
 	
 private:
 
@@ -113,6 +115,9 @@ private:
 	UFUNCTION()
 	void EquippedGridSlotClicked(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
 
+	UFUNCTION()
+	void EquippedSlottedItemClicked(USInv_EquippedSlottedItem* SlottedItem);
+	
 	bool CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag ) const; 
 	// --------------------//
 	//	 Helper Functions //
