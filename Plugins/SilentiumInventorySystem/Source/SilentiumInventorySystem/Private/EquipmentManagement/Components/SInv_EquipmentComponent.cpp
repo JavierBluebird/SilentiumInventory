@@ -14,19 +14,35 @@
 void USInv_EquipmentComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OwningPlayerController = Cast<APlayerController>(GetOwner());
-
+	InitPlayerController();
+	
+}
+void USInv_EquipmentComponent::InitPlayerController()
+{
 	// Only if our owner is a Player controller we proceed.
-	if (OwningPlayerController.IsValid())
+	if (OwningPlayerController = Cast<APlayerController>(GetOwner()); OwningPlayerController.IsValid())
 	{
-		ACharacter* OwnerCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn());
-		if (OwnerCharacter)
+		if (ACharacter* OwnerCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn())
+			; IsValid(OwnerCharacter))
 		{
-			OwningSkeletalMesh = OwnerCharacter->GetMesh();
+			OnPossessedPawnChange(nullptr, OwnerCharacter);
+		}
+		else
+		{
+			OwningPlayerController->OnPossessedPawnChanged.AddDynamic(this,&ThisClass::OnPossessedPawnChange);
 		}
 		InitInventoryComponent();
 	}
+}
+void USInv_EquipmentComponent::OnPossessedPawnChange(APawn* OldPawn, APawn* NewPawn)
+{
+	
+		if (ACharacter* OwnerCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn())
+			; IsValid(OwnerCharacter))
+		{
+			OwningSkeletalMesh = OwnerCharacter->GetMesh();
+		}
+	InitInventoryComponent();
 }
 
 void USInv_EquipmentComponent::InitInventoryComponent()
@@ -51,9 +67,8 @@ void USInv_EquipmentComponent::InitInventoryComponent()
 }
 
 ASInv_EquipActor* USInv_EquipmentComponent::SpawnEquippedActor(FSInv_EquipmentFragment* EquipmentFragment,
-	const FSInv_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh)
+                                                               const FSInv_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh)
 {
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE,10,FColor::Red,"SpawnEquippedActor");
 	ASInv_EquipActor* SpawnedEquipActor = EquipmentFragment->SpawnAttachedActor(AttachMesh);
 	SpawnedEquipActor->SetEquipmentType(EquipmentFragment->GetEquipmentTag());
 	SpawnedEquipActor->SetOwner(GetOwner());
