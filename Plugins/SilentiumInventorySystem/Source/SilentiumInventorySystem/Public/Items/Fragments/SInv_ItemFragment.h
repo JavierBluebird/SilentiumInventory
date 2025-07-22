@@ -7,6 +7,7 @@
 #include "Types/AttributeStorage.h"
 #include "SInv_ItemFragment.generated.h"
 
+class ASInv_EquipActor;
 class USInv_CompositeBase;
 class APlayerController;
 /*----------------------------------------------------------------*/
@@ -319,9 +320,25 @@ struct FSInv_EquipmentFragment : public FSInv_InventoryItemFragment
 	void OnEquip(APlayerController* PC);
 	void OnUnequip(APlayerController* PC);
 	virtual void Manifest() override;
+
+	ASInv_EquipActor* SpawnAttachedActor(USkeletalMeshComponent* AttachMesh) const;
+	void DestroyAttachedActor() const;
+	FGameplayTag GetEquipmentTag() const { return EquipmentType; }
+	void SetEquippedActor(ASInv_EquipActor* EquipActor);
 	
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Attributes modifiers must be added individually to this Array."))
 	TArray<TInstancedStruct<FSInv_EquipModifier>> EquipModifiers;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory")
+	TSubclassOf<ASInv_EquipActor> EquipActorClass = nullptr;
+	
+	TWeakObjectPtr<ASInv_EquipActor> EquippedActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Socket in the Mesh this Equipment will be attached to."))
+	FName SocketAttachPoint{NAME_None};
+
+	UPROPERTY(EditAnywhere, Category = "Silentium Inventory", meta = (ToolTip = "Tag related to the Equipment Type for System Detection."))
+	FGameplayTag EquipmentType = FGameplayTag::EmptyTag;
 };

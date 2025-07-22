@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "SInv_EquipmentComponent.generated.h"
 
+struct FSInv_ItemManifest;
+struct FSInv_EquipmentFragment;
+class ASInv_EquipActor;
 class USInv_InventoryItem;
 class APlayerController;
 class USInv_InventoryComponent;
@@ -37,4 +40,11 @@ private:
 	void OnItemUnequipped(USInv_InventoryItem* UnequippedItem);
 	
 	void InitInventoryComponent();
+	
+	ASInv_EquipActor* SpawnEquippedActor(FSInv_EquipmentFragment* EquipmentFragment,
+		const FSInv_ItemManifest& Manifest,
+		USkeletalMeshComponent* AttachMesh);
+
+	UPROPERTY()
+	TArray<TObjectPtr<ASInv_EquipActor>> EquippedActors;
 };

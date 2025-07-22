@@ -1,5 +1,6 @@
 ﻿#include "Items/Fragments/SInv_ItemFragment.h"
 
+#include "EquipmentManagement/EquipActor/SInv_EquipActor.h"
 #include "Widgets/Composite/SInv_CompositeBase.h"
 #include "Widgets/Composite/SInv_Leaf_Image.h"
 #include "Widgets/Composite/SInv_Leaf_LabeledValue.h"
@@ -73,9 +74,32 @@ void FSInv_EquipmentFragment::Manifest()
 	}
 }
 
+ASInv_EquipActor* FSInv_EquipmentFragment::SpawnAttachedActor(USkeletalMeshComponent* AttachMesh) const
+{
+	if (!IsValid(EquipActorClass) || !IsValid(AttachMesh)) return nullptr;
+
+	ASInv_EquipActor* SpawnedActor = AttachMesh->GetWorld()->SpawnActor<ASInv_EquipActor>(EquipActorClass);
+	SpawnedActor->AttachToComponent(AttachMesh,FAttachmentTransformRules::SnapToTargetNotIncludingScale,SocketAttachPoint);
+
+	return SpawnedActor;
+}
+
+void FSInv_EquipmentFragment::DestroyAttachedActor() const
+{
+	if (EquippedActor.IsValid())
+	{
+		EquippedActor->Destroy();
+	}
+}
+
+void FSInv_EquipmentFragment::SetEquippedActor(ASInv_EquipActor* EquipActor)
+{
+	EquippedActor = EquipActor;
+}
+
 /*-----------------------------------------------------------*/
 /*		Equip Modifier Fragments Composite Functions		*/
-/*--------------------------------------------------....----*/
+/*----------------------------------------------------------*/
 void FSInv_StrengthModifier::OnEquip(APlayerController* PC)
 {
 	GEngine->AddOnScreenDebugMessage(INDEX_NONE,5.f,
