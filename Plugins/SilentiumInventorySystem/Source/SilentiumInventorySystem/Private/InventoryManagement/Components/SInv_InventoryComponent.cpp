@@ -120,6 +120,7 @@ void USInv_InventoryComponent::ToggleInventoryMenu()
 	{
 		OpenInventoryMenu();
 	}
+	OnInventoryMenuToggled.Broadcast(bInventoryMenuOpen);
 }
 
 void USInv_InventoryComponent::OpenInventoryMenu()

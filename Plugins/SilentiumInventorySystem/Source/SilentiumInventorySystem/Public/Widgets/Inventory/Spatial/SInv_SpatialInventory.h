@@ -39,7 +39,7 @@ public:
 
 	virtual USInv_HoverItem* GetHoverItem() const override;
 	virtual float GetSlotSize() const override;
-	
+
 private:
 
 	UPROPERTY()
@@ -124,6 +124,7 @@ private:
 	void RemoveEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem);
 	void MakeEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem, USInv_EquippedGridSlot* EquippedGridSlot, USInv_InventoryItem* ItemToEquip);
 	void BroadcastSlotClickedDelegates(USInv_InventoryItem* ItemToEquip, USInv_InventoryItem* ItemToUnequip) const;
+	
 	
 	// --------------------//
 	//	 Helper Functions //

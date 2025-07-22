@@ -54,6 +54,7 @@ public:
 	void ClearHoveredItem();
 
 	void AssignHoverItem(USInv_InventoryItem* InventoryItem);
+	void OnHide();
 
 private:
 
@@ -66,10 +67,10 @@ private:
 	void ConstructGrid();
 
 	// Overload with Inventory Item
-	FSInv_SlotAvailabilityResult HasRoomForItem(const USInv_InventoryItem* Item);
+	FSInv_SlotAvailabilityResult HasRoomForItem(const USInv_InventoryItem* Item, const int32 StackAmountOverride = -1);
 
 	// Overload with Manifest
-	FSInv_SlotAvailabilityResult HasRoomForItem(const FSInv_ItemManifest& Manifest);
+	FSInv_SlotAvailabilityResult HasRoomForItem(const FSInv_ItemManifest& Manifest, const int32 StackAmountOverride = -1);
 
 	void AddItemToIndices(const FSInv_SlotAvailabilityResult& Result, USInv_InventoryItem* NewItem);
 	bool MatchesCategory(const USInv_InventoryItem* Item) const;
@@ -162,6 +163,9 @@ private:
 
 	UFUNCTION()
 	void OnPopUpMenuConsume(int32 Index);
+
+	UFUNCTION()
+	void OnInventoryMenuToggled(bool bOpen);
 	
 	/*----------------------------------*/
 	/*		Hover Item Mouse Events		*/
@@ -214,7 +218,7 @@ private:
 	bool ShouldFillInStack(const int32 RoomInClickedSlot, const int32 HoveredStackCount) const;
 	void FillInStack(const int32 FillAmount, const int32 Remainder, const int32 Index);
 	void CreateItemPopUp(const int32 GridIndex);
-	
+	void PutHoverItemBack();
 	/*---------------------------------------------------*/
 	/*													 */
 	/*			Member Variables Section				 */
