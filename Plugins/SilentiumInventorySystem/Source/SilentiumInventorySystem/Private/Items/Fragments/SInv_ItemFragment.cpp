@@ -5,11 +5,11 @@
 #include "Widgets/Composite/SInv_Leaf_LabeledValue.h"
 #include "Widgets/Composite/SInv_Leaf_Text.h"
 
-/*------------------------------------------*/
-/*											*/
-/*		   Fragments Assimilations			*/
-/*											*/
-/*------------------------------------------*/
+/*----------------------------------------------*/
+/*									     		*/
+/*		   Base Fragments Assimilations			*/
+/*										    	*/
+/*----------------------------------------------*/
 void FSInv_InventoryItemFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
 	if (!MatchesWidgetTag(Composite)) return;
@@ -63,6 +63,16 @@ void FSInv_EquipmentFragment::OnUnequip(APlayerController* PC)
 	}
 }
 
+void FSInv_EquipmentFragment::Manifest()
+{
+	FSInv_InventoryItemFragment::Manifest();
+	for (auto& Modifier : EquipModifiers)
+	{
+		auto& ModRef = Modifier.GetMutable();
+		ModRef.Manifest();
+	}
+}
+
 /*-----------------------------------------------------------*/
 /*		Equip Modifier Fragments Composite Functions		*/
 /*--------------------------------------------------....----*/
@@ -83,7 +93,9 @@ void FSInv_StrengthModifier::OnUnequip(APlayerController* PC)
 											TEXT("Item Unequipped. Strength decreased by: %f"),
 											GetValue()));
 }
-
+/*-----------------------------------------------------------*/
+/*		Equip Modifier Fragments Composite End				*/
+/*--------------------------------------------------....----*/
 void FSInv_ImageFragment::Assimilate(USInv_CompositeBase* Composite) const
 {
 	FSInv_InventoryItemFragment::Assimilate(Composite);

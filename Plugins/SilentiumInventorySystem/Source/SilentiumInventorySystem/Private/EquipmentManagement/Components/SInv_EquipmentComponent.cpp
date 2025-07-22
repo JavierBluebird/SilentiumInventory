@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
 #include "InventoryManagement/Utils/SInv_InventoryStatics.h"
+#include "Items/SInv_InventoryItem.h"
+#include "Items/Fragments/SInv_ItemFragment.h"
 
 
 void USInv_EquipmentComponent::BeginPlay()
@@ -49,11 +51,27 @@ void USInv_EquipmentComponent::InitInventoryComponent()
 
 void USInv_EquipmentComponent::OnItemEquipped(USInv_InventoryItem* EquippedItem)
 {
+	if (!EquippedItem) return;
+	if (!OwningPlayerController->HasAuthority()) return; // Only happens on server.
+
+	FSInv_ItemManifest& ItemManifest = EquippedItem->GetItemManifestMutable();
+	FSInv_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FSInv_EquipmentFragment>();
+
+	if (!EquipmentFragment) return;
 	
+	EquipmentFragment->OnEquip(OwningPlayerController.Get());
 }
 
 void USInv_EquipmentComponent::OnItemUnequipped(USInv_InventoryItem* UnequippedItem)
 {
+	if (!UnequippedItem) return;
+	if (!OwningPlayerController->HasAuthority()) return; // Only happens on server.
+
+	FSInv_ItemManifest& ItemManifest = UnequippedItem->GetItemManifestMutable();
+	FSInv_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FSInv_EquipmentFragment>();
+
+	if (!EquipmentFragment) return;
 	
+	EquipmentFragment->OnUnequip(OwningPlayerController.Get());
 }
 

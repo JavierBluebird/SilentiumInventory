@@ -318,6 +318,7 @@ struct FSInv_EquipmentFragment : public FSInv_InventoryItemFragment
 	bool bEquipped {false};
 	void OnEquip(APlayerController* PC);
 	void OnUnequip(APlayerController* PC);
+	virtual void Manifest() override;
 	
 private:
 
