@@ -17,6 +17,7 @@ public:
 	
 	ASInv_ProxyMeshActor();
 
+	USkeletalMeshComponent* GetMesh() const { return Mesh; };
 protected:
 
 	virtual void BeginPlay() override;
