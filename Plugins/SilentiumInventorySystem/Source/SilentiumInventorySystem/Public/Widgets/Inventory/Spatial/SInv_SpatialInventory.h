@@ -116,12 +116,15 @@ private:
 	void EquippedGridSlotClicked(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag);
 
 	UFUNCTION()
-	void EquippedSlottedItemClicked(USInv_EquippedSlottedItem* SlottedItem);
+	void EquippedSlottedItemClicked(USInv_EquippedSlottedItem* EquippedSlottedItem);
 	
 	bool CanEquipHoverItem(USInv_EquippedGridSlot* EquippedGridSlot, const FGameplayTag& EquipmentTypeTag ) const;
 	USInv_EquippedGridSlot* FindSlotWithEquippedItem(USInv_InventoryItem* EquippedItem) const;
 	void ClearSlotOfItem(USInv_EquippedGridSlot* EquippedGridSlot);
 	void RemoveEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem);
+	void MakeEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem, USInv_EquippedGridSlot* EquippedGridSlot, USInv_InventoryItem* ItemToEquip);
+	void BroadcastSlotClickedDelegates(USInv_InventoryItem* ItemToEquip, USInv_InventoryItem* ItemToUnequip) const;
+	
 	// --------------------//
 	//	 Helper Functions //
 	// -------------------//

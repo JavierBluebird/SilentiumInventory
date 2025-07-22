@@ -81,7 +81,7 @@ void USInv_SpatialInventory::EquippedGridSlotClicked(USInv_EquippedGridSlot* Equ
 	}
 }
 
-void USInv_SpatialInventory::EquippedSlottedItemClicked(USInv_EquippedSlottedItem* SlottedItem)
+void USInv_SpatialInventory::EquippedSlottedItemClicked(USInv_EquippedSlottedItem* EquippedSlottedItem)
 {
 	// Remove the Item Description
 	USInv_InventoryStatics::ItemUnhovered(GetOwningPlayer());
@@ -91,7 +91,7 @@ void USInv_SpatialInventory::EquippedSlottedItemClicked(USInv_EquippedSlottedIte
 	USInv_InventoryItem* ItemToEquip = IsValid(GetHoverItem()) ? GetHoverItem()->GetInventoryItem() : nullptr;
 	
 	// Get Item to Unequip
-	USInv_InventoryItem* ItemToUnequip = SlottedItem->GetInventoryItem();
+	USInv_InventoryItem* ItemToUnequip = EquippedSlottedItem->GetInventoryItem();
 	
 	// Get the Equipped Grid Slot holding this Item.
 	USInv_EquippedGridSlot* EquippedGridSlot = FindSlotWithEquippedItem(ItemToUnequip);
@@ -103,10 +103,13 @@ void USInv_SpatialInventory::EquippedSlottedItemClicked(USInv_EquippedSlottedIte
 	Grid_Equippables->AssignHoverItem(ItemToUnequip);
 	
 	// Remove of the equipped slotted item from the equipped grid slot
-	RemoveEquippedSlottedItem(SlottedItem);
+	RemoveEquippedSlottedItem(EquippedSlottedItem);
 	
 	// Make a new equipped slotted item (for the item we held in HoverItem)
+	MakeEquippedSlottedItem(EquippedSlottedItem, EquippedGridSlot, ItemToEquip);
+	
 	// Broadcast delegates for OnItemEquipped / OnItemUnequipped (from the IC)
+	BroadcastSlotClickedDelegates(ItemToEquip,ItemToUnequip);
 }
 
 USInv_EquippedGridSlot* USInv_SpatialInventory::FindSlotWithEquippedItem(USInv_InventoryItem* EquippedItem) const
@@ -127,6 +130,35 @@ void USInv_SpatialInventory::RemoveEquippedSlottedItem(USInv_EquippedSlottedItem
 	}
 	EquippedSlottedItem->RemoveFromParent();
 }
+
+void USInv_SpatialInventory::MakeEquippedSlottedItem(USInv_EquippedSlottedItem* EquippedSlottedItem, USInv_EquippedGridSlot* EquippedGridSlot,
+	USInv_InventoryItem* ItemToEquip)
+{
+	if (!IsValid(EquippedGridSlot)) return;
+
+	USInv_EquippedSlottedItem* SlottedItem = EquippedGridSlot->OnItemEquipped(
+		ItemToEquip,
+		EquippedSlottedItem->GetEquipmentTypeTag(),
+		USInv_InventoryStatics::GetInventoryWidget(GetOwningPlayer())->GetSlotSize());
+	if (IsValid(SlottedItem)) SlottedItem->OnEquippedSlottedItemClicked.AddDynamic(this,&ThisClass::EquippedSlottedItemClicked);
+
+	EquippedGridSlot->SetEquippedSlottedItem(SlottedItem);
+}
+
+void USInv_SpatialInventory::BroadcastSlotClickedDelegates(USInv_InventoryItem* ItemToEquip, USInv_InventoryItem* ItemToUnequip) const
+{
+	USInv_InventoryComponent* InventoryComponent = USInv_InventoryStatics::GetInventoryComponent(GetOwningPlayer());
+	check(IsValid(InventoryComponent));
+
+	InventoryComponent->Server_EquipSlotClicked(ItemToEquip, ItemToUnequip);
+
+	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
+	{
+		InventoryComponent->OnItemEquipped.Broadcast(ItemToEquip);
+		InventoryComponent->OnItemEquipped.Broadcast(ItemToUnequip);
+	}
+}
+
 void USInv_SpatialInventory::ClearSlotOfItem(USInv_EquippedGridSlot* EquippedGridSlot)
 {
 	if (IsValid(EquippedGridSlot))
