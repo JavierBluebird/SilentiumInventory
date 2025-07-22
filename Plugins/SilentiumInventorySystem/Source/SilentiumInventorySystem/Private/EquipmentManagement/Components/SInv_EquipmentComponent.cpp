@@ -53,6 +53,7 @@ void USInv_EquipmentComponent::InitInventoryComponent()
 ASInv_EquipActor* USInv_EquipmentComponent::SpawnEquippedActor(FSInv_EquipmentFragment* EquipmentFragment,
 	const FSInv_ItemManifest& Manifest, USkeletalMeshComponent* AttachMesh)
 {
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE,10,FColor::Red,"SpawnEquippedActor");
 	ASInv_EquipActor* SpawnedEquipActor = EquipmentFragment->SpawnAttachedActor(AttachMesh);
 	SpawnedEquipActor->SetEquipmentType(EquipmentFragment->GetEquipmentTag());
 	SpawnedEquipActor->SetOwner(GetOwner());
@@ -60,11 +61,31 @@ ASInv_EquipActor* USInv_EquipmentComponent::SpawnEquippedActor(FSInv_EquipmentFr
 	return SpawnedEquipActor;
 }
 
+ASInv_EquipActor* USInv_EquipmentComponent::FindEquippedActor(const FGameplayTag& EquipmentTypeTag)
+{
+	
+	auto FoundActor = EquippedActors.FindByPredicate(
+		[&EquipmentTypeTag](const ASInv_EquipActor* EquippedActor)
+	{
+		return EquippedActor->GetEquipmentType().MatchesTagExact(EquipmentTypeTag);
+	});
+	return FoundActor ? *FoundActor : nullptr;
+}
+
+
+void USInv_EquipmentComponent::RemoveEquippedActor(const FGameplayTag& EquipmentTypeTag)
+{
+	if (ASInv_EquipActor* EquippedActor = FindEquippedActor(EquipmentTypeTag); IsValid(EquippedActor))
+	{
+		EquippedActors.Remove(EquippedActor);
+		EquippedActor->Destroy();
+	}
+}
+
 void USInv_EquipmentComponent::OnItemEquipped(USInv_InventoryItem* EquippedItem)
 {
 	if (!EquippedItem) return;
 	if (!OwningPlayerController->HasAuthority()) return; // Only happens on server.
-
 	FSInv_ItemManifest& ItemManifest = EquippedItem->GetItemManifestMutable();
 	FSInv_EquipmentFragment* EquipmentFragment = ItemManifest.GetFragmentOfTypeMutable<FSInv_EquipmentFragment>();
 
@@ -92,5 +113,7 @@ void USInv_EquipmentComponent::OnItemUnequipped(USInv_InventoryItem* UnequippedI
 	if (!EquipmentFragment) return;
 	
 	EquipmentFragment->OnUnequip(OwningPlayerController.Get());
+
+	RemoveEquippedActor(EquipmentFragment->GetEquipmentTag());
 }
 

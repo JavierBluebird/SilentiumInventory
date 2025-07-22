@@ -71,11 +71,7 @@ void USInv_SpatialInventory::EquippedGridSlotClicked(USInv_EquippedGridSlot* Equ
 	check(IsValid(InventoryComponent));
 	
 	InventoryComponent->Server_EquipSlotClicked(HoverItem->GetInventoryItem(),nullptr);
-
-	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
-	{
-		InventoryComponent->OnItemEquipped.Broadcast(HoverItem->GetInventoryItem());
-	}
+	
 	// Clear the Hover Item
 	Grid_Equippables->ClearHoveredItem();
 }
@@ -150,12 +146,7 @@ void USInv_SpatialInventory::BroadcastSlotClickedDelegates(USInv_InventoryItem* 
 	check(IsValid(InventoryComponent));
 
 	InventoryComponent->Server_EquipSlotClicked(ItemToEquip, ItemToUnequip);
-
-	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
-	{
-		InventoryComponent->OnItemEquipped.Broadcast(ItemToEquip);
-		InventoryComponent->OnItemEquipped.Broadcast(ItemToUnequip);
-	}
+	
 }
 
 void USInv_SpatialInventory::ClearSlotOfItem(USInv_EquippedGridSlot* EquippedGridSlot)

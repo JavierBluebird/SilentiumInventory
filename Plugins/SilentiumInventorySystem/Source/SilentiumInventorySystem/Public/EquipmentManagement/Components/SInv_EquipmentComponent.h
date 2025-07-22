@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SInv_EquipmentComponent.generated.h"
 
+struct FGameplayTag;
 struct FSInv_ItemManifest;
 struct FSInv_EquipmentFragment;
 class ASInv_EquipActor;
@@ -47,4 +48,7 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<ASInv_EquipActor>> EquippedActors;
+
+	ASInv_EquipActor* FindEquippedActor(const FGameplayTag& EquipmentTypeTag);
+	void RemoveEquippedActor(const FGameplayTag& EquipmentTypeTag);
 };
