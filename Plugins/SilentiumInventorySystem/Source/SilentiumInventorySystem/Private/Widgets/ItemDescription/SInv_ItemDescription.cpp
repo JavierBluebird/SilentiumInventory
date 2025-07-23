@@ -9,3 +9,13 @@ FVector2D USInv_ItemDescription::GetBoxSize() const
 {
 	return SizeBox->GetDesiredSize();
 }
+
+void USInv_ItemDescription::SetVisibility(ESlateVisibility VisibilitySettings)
+{
+	for (auto Child : GetChildren())
+	{
+		Child->Collapse();
+	}
+	
+	Super::SetVisibility(VisibilitySettings);
+}

@@ -178,13 +178,13 @@ void USInv_InventoryComponent::TryAddItem(USInv_ItemComponent* ItemComponent)
 	else if (Result.TotalRoomToFill > 0) 
 	{
 		// This item type doesn't exist in the inventory. Create a new one and update all pertinent slots.
-		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0);
+		Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0, Result.Remainder);
 	}
 }
 
 // SERVER RPCS
 
-void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount)
+void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder)
 {
 	USInv_InventoryItem* NewItem = InventoryList.AddItemEntry(ItemComponent); // Adds the item to Inventory Array
 	NewItem->SetTotalStackCount(StackCount);
@@ -194,7 +194,15 @@ void USInv_InventoryComponent::Server_AddNewItem_Implementation(USInv_ItemCompon
 	{
 		OnItemAdded.Broadcast(NewItem); // Instant broadcast since we are the Server, not the Client. 
 	}
-	ItemComponent->PickedUp();
+	
+	if (Remainder == 0)
+	{
+		ItemComponent->PickedUp();
+	}
+	else if (FSInv_StackableFragment* StackableFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeMutable<FSInv_StackableFragment>())
+	{
+		StackableFragment->SetStackCount(Remainder);
+	}
 }
 
 void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemComponent* ItemComponent,
@@ -212,7 +220,7 @@ void USInv_InventoryComponent::Server_AddStacksToItem_Implementation(USInv_ItemC
 		ItemComponent->PickedUp();
 	}
 	// Otherwise, update the stack count for the item pickup.
-	else if (FSInv_StackableFragment* StackableFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeMutable<FSInv_StackableFragment>())
+	else if (FSInv_StackableFragment* StackableFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeMutable<FSInv_StackableFragment>())
 	{
 		StackableFragment->SetStackCount(Remainder);
 	}

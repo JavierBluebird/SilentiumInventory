@@ -35,6 +35,8 @@ void USInv_EquippedGridSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEven
 	USInv_HoverItem* HoverItem = USInv_InventoryStatics::GetHoveredItem(GetOwningPlayer());
 	if (!HoverItem) return;
 
+	if (IsValid(EquippedSlottedItem)) return;
+	
 	if (HoverItem->GetItemType().MatchesTag(EquipmentTypeTag)) // Partially matches hierarchy
 	{
 		SetUnoccupiedTexture();

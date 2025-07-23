@@ -239,8 +239,8 @@ void USInv_SpatialInventory::OnItemHovered(USInv_InventoryItem* InventoryItem)
 	FTimerDelegate DescriptionTimerDelegate;
 	DescriptionTimerDelegate.BindLambda([this, &Manifest,DescriptionWidget]() // Defines the delegate functionality
 		{
-			Manifest.AssimilateInventoryFragments(DescriptionWidget);
 			GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
+			Manifest.AssimilateInventoryFragments(DescriptionWidget);
 		}
 	);
 	GetOwningPlayer()->GetWorldTimerManager().SetTimer(DescriptionTimer,  // Actually Starts timer

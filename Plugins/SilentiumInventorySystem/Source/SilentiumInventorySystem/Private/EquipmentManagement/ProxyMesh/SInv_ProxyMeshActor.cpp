@@ -10,7 +10,8 @@
 ASInv_ProxyMeshActor::ASInv_ProxyMeshActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
+	SetReplicates(false);
+	
 	RootComponent = CreateDefaultSubobject<USceneComponent>("RootComponent");
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);

@@ -42,7 +42,7 @@ public:
 	/*			Server RPCs			 */
 	/*-------------------------------*/
 	UFUNCTION(Server,Reliable)
-	void Server_AddNewItem(USInv_ItemComponent* ItemComponent, int32 StackCount);
+	void Server_AddNewItem(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 
 	UFUNCTION(Server,Reliable)
 	void Server_AddStacksToItem(USInv_ItemComponent* ItemComponent, int32 StackCount, int32 Remainder);

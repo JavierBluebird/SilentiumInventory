@@ -22,7 +22,8 @@ public:
 
 	void InitItemManifest(FSInv_ItemManifest CopyOfManifest);
 	
-	FSInv_ItemManifest GetItemManifest() const {return ItemManifest;};
+	FSInv_ItemManifest GetItemManifest() const {return ItemManifest; };
+	FSInv_ItemManifest& GetItemManifestMutable()  { return ItemManifest; };
 
 	void PickedUp();
 

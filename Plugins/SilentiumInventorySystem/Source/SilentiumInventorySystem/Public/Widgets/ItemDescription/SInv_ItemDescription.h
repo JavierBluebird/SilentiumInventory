@@ -18,7 +18,7 @@ class SILENTIUMINVENTORYSYSTEM_API USInv_ItemDescription : public USInv_Composit
 public:
 
 	FVector2D GetBoxSize() const;
-
+	virtual void SetVisibility(ESlateVisibility VisibilitySettings) override;
 private:
 
 	UPROPERTY(meta = (BindWidget))

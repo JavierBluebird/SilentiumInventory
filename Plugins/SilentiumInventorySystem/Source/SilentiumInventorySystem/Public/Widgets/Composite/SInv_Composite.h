@@ -22,6 +22,8 @@ public:
 	/*----------------------------------------------*/
 	virtual void ApplyFunction(FuncType Function) override;
 	virtual void Collapse() override;
+	TArray<USInv_CompositeBase*> GetChildren() { return Children; }
+	
 private:
 	
 	UPROPERTY()
