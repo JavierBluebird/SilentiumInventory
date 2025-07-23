@@ -19,6 +19,7 @@ class USInv_InventoryGrid;
 /**
  * 
  */
+
 UCLASS()
 class SILENTIUMINVENTORYSYSTEM_API USInv_SpatialInventory : public USInv_InventoryBase
 {
@@ -90,15 +91,40 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USInv_ItemDescription> ItemDescription;
-
+	
 	USInv_ItemDescription* GetItemDescription();
-
+	
 	FTimerHandle DescriptionTimer;
-
+	
 	UPROPERTY(EditAnywhere,Category="Silentium Inventory", meta =(ToolTip = "How much time will it take for Item Description Widget to Show up"))
 	float DescriptionTimerDelay {0.5f};
 
 	void SetItemDescriptionSizeAndPosition(USInv_ItemDescription* Description, UCanvasPanel* Canvas) const;
+	
+	// ----------------------------------------//
+	// Equipped Item Description objects	  //
+	// --------------------------------------//
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USInv_ItemDescription> EquippedItemDescriptionClass;
+
+	UPROPERTY()
+	TObjectPtr<USInv_ItemDescription> EquippedItemDescription;
+
+	USInv_ItemDescription* GetEquippedItemDescription();
+	
+	FTimerHandle EquippedDescriptionTimer;
+
+	UPROPERTY(EditAnywhere,Category="Silentium Inventory", meta =(ToolTip = "How much time will it take for Equipped Item Description Widget to Show up"))
+	float EquippedDescriptionTimerDelay {0.5f};
+
+	UFUNCTION()
+	void ShowEquippedItemDescription(USInv_InventoryItem* Item);
+	void SetEquippedItemDescriptionSizeAndPosition(USInv_ItemDescription* Description,
+		USInv_ItemDescription* EquippedDescription,
+		UCanvasPanel* Canvas) const;
+
+
 	// --------------------//
 	// Callback Functions //
 	// -------------------//
@@ -135,4 +161,5 @@ private:
 	TWeakObjectPtr<USInv_InventoryGrid> ActiveGrid;
 
 };
+
 

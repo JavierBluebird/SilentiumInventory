@@ -17,6 +17,7 @@
 #include "Widgets/Inventory/GridSlots/SInv_EquippedGridSlot.h"
 #include "Widgets/Inventory/SlottedItems/SInv_EquippedSlottedItem.h"
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
+#include "Items/Fragments/SInv_ItemFragment.h"
 #include "Widgets/ItemDescription/SInv_ItemDescription.h"
 
 
@@ -189,6 +190,7 @@ void USInv_SpatialInventory::NativeTick(const FGeometry& MyGeometry, float InDel
 	if (!IsValid(ItemDescription)) return;
 
 	SetItemDescriptionSizeAndPosition(ItemDescription,CanvasPanel);
+	SetEquippedItemDescriptionSizeAndPosition(ItemDescription,EquippedItemDescription,CanvasPanel);
 }
 
 void USInv_SpatialInventory::SetItemDescriptionSizeAndPosition(USInv_ItemDescription* Description,
@@ -201,10 +203,33 @@ void USInv_SpatialInventory::SetItemDescriptionSizeAndPosition(USInv_ItemDescrip
 	const FVector2D ItemDescriptionSize = Description->GetBoxSize();
 	ItemDescriptionCPS->SetSize(ItemDescriptionSize);
 
-	FVector2D ClampedPosition = USInv_WidgetUtils::GetClampedWidgetPosition(USInv_WidgetUtils::GetWidgetSize(Canvas),
-																			ItemDescriptionSize,
-																			UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer()));
+	FVector2D ClampedPosition = USInv_WidgetUtils::GetClampedWidgetPosition(
+		USInv_WidgetUtils::GetWidgetSize(Canvas),
+		ItemDescriptionSize,
+		UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer()));
+	
 	ItemDescriptionCPS->SetPosition(ClampedPosition);
+}
+
+void USInv_SpatialInventory::SetEquippedItemDescriptionSizeAndPosition(USInv_ItemDescription* Description,
+	USInv_ItemDescription* EquippedDescription, UCanvasPanel* Canvas) const
+{
+	UCanvasPanelSlot* ItemDescriptionCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Description);
+	UCanvasPanelSlot* EquippedItemDescriptionCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(EquippedDescription);
+
+	if (!IsValid(ItemDescriptionCPS) ||!IsValid(EquippedItemDescriptionCPS)) return;
+	
+	const FVector2D ItemDescriptionSize = Description->GetBoxSize();
+	const FVector2D EquippedItemDescriptionSize = EquippedDescription->GetBoxSize();
+
+	FVector2D ClampedPosition = USInv_WidgetUtils::GetClampedWidgetPosition(
+		USInv_WidgetUtils::GetWidgetSize(Canvas),
+		ItemDescriptionSize,
+		UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer()));
+
+	ClampedPosition.X -= EquippedItemDescriptionSize.X;
+	EquippedItemDescriptionCPS->SetSize(EquippedItemDescriptionSize);
+	EquippedItemDescriptionCPS->SetPosition(ClampedPosition);
 }
 
 FSInv_SlotAvailabilityResult USInv_SpatialInventory::HasRoomForItem(USInv_ItemComponent* ItemComponent) const
@@ -235,14 +260,22 @@ void USInv_SpatialInventory::OnItemHovered(USInv_InventoryItem* InventoryItem)
 	DescriptionWidget->SetVisibility(ESlateVisibility::Collapsed);
 
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer); // If it's active, deactivate first.
-	
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(EquippedDescriptionTimer); // If it's active, deactivate first.
+
 	FTimerDelegate DescriptionTimerDelegate;
-	DescriptionTimerDelegate.BindLambda([this, &Manifest,DescriptionWidget]() // Defines the delegate functionality
+	DescriptionTimerDelegate.BindLambda([this, InventoryItem,&Manifest,DescriptionWidget]() // Defines the delegate functionality
 		{
 			GetItemDescription()->SetVisibility(ESlateVisibility::HitTestInvisible);
 			Manifest.AssimilateInventoryFragments(DescriptionWidget);
-		}
-	);
+
+			// Start the timer for the second item description showing the Equipped Item of this type.
+			FTimerDelegate EquippedDescriptionTimerDelegate;
+			EquippedDescriptionTimerDelegate.BindUObject(this,&ThisClass::ShowEquippedItemDescription,InventoryItem);
+			GetOwningPlayer()->GetWorldTimerManager().SetTimer(EquippedDescriptionTimer,  // Actually Starts timer
+															  EquippedDescriptionTimerDelegate,
+															  EquippedDescriptionTimerDelay,
+															  false);
+		});
 	GetOwningPlayer()->GetWorldTimerManager().SetTimer(DescriptionTimer,  // Actually Starts timer
 														  DescriptionTimerDelegate,
 														  DescriptionTimerDelay,
@@ -253,6 +286,9 @@ void USInv_SpatialInventory::OnItemUnhovered()
 {
 	GetItemDescription()->SetVisibility(ESlateVisibility::Collapsed);
 	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(DescriptionTimer);
+	
+	GetEquippedItemDescription()->SetVisibility(ESlateVisibility::Collapsed);
+	GetOwningPlayer()->GetWorldTimerManager().ClearTimer(EquippedDescriptionTimer);
 }
 
 USInv_HoverItem* USInv_SpatialInventory::GetHoverItem() const
@@ -284,6 +320,57 @@ USInv_ItemDescription* USInv_SpatialInventory::GetItemDescription()
 		CanvasPanel->AddChild(ItemDescription);
 	}
 	return ItemDescription;
+}
+
+USInv_ItemDescription* USInv_SpatialInventory::GetEquippedItemDescription()
+{
+	if (!IsValid(EquippedItemDescription))
+	{
+		EquippedItemDescription = CreateWidget<USInv_ItemDescription>(GetOwningPlayer(),EquippedItemDescriptionClass);
+		CanvasPanel->AddChild(EquippedItemDescription);
+	}
+	return EquippedItemDescription;
+}
+
+void USInv_SpatialInventory::ShowEquippedItemDescription(USInv_InventoryItem* Item)
+{
+	const auto& Manifest = Item->GetItemManifest();
+	const FSInv_EquipmentFragment* EquipmentFragment = Manifest.GetFragmentOfType<FSInv_EquipmentFragment>();
+	if (!EquipmentFragment) return;
+
+	const FGameplayTag HoveredEquipmentType = EquipmentFragment->GetEquipmentTag();
+
+	auto* EquippedGridSlot = EquippedGridSlots.FindByPredicate([Item](const USInv_EquippedGridSlot* GridSlot)
+	{
+		return GridSlot->GetInventoryItem() == Item;
+	});
+	
+	if (EquippedGridSlot != nullptr) return; // The Hovered item is already equipped, we're already showing it's Item Description.
+
+	// It's not equipped, so find the equipped item with the same equipment type.
+	auto FoundEquippedSlot = EquippedGridSlots.FindByPredicate(
+		[HoveredEquipmentType]
+		(const USInv_EquippedGridSlot* GridSlot)
+	{
+			USInv_InventoryItem* InventoryItem = GridSlot->GetInventoryItem().Get();
+			return IsValid(InventoryItem) ? InventoryItem->GetItemManifest().GetFragmentOfType<FSInv_EquipmentFragment>()->GetEquipmentTag() == HoveredEquipmentType : false;
+	});
+	
+	USInv_EquippedGridSlot* EquippedSlot = FoundEquippedSlot ? *FoundEquippedSlot : nullptr;
+	if (!IsValid(EquippedSlot)) return; // No equipped item with the same Equipment type.
+
+	USInv_InventoryItem* EquippedItem = EquippedSlot->GetInventoryItem().Get();
+	if (!IsValid(EquippedItem)) return;
+
+	const auto& EquippedItemManifest = EquippedItem->GetItemManifest();
+	USInv_ItemDescription* DescriptionWidget = GetEquippedItemDescription();
+
+	// Assimilates item equipped info.
+	auto EquippedDescriptionWidget = GetEquippedItemDescription();
+	
+	EquippedDescriptionWidget->Collapse();
+	DescriptionWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	EquippedItemManifest.AssimilateInventoryFragments(EquippedDescriptionWidget);
 }
 
 void USInv_SpatialInventory::ShowEquippables()
