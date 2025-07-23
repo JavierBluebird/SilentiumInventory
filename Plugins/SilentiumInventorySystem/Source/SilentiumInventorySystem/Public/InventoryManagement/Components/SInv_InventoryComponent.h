@@ -36,6 +36,7 @@ public:
 	void ToggleInventoryMenu();
 	void SpawnDroppedItem(USInv_InventoryItem* Item, const int32 StackCount);
 	USInv_InventoryBase* GetInventoryMenu() const;
+	bool IsMenuOpen() const { return bInventoryMenuOpen; }
 	
 	/*-------------------------------*/
 	/*			Server RPCs			 */

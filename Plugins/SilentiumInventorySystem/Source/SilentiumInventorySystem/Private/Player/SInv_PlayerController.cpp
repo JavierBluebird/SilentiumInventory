@@ -68,6 +68,15 @@ void ASInv_PlayerController::ToggleInventory()
 {
 	if (!InventoryComponent.IsValid()) return; // weak pointer, needs to be validated.
 	InventoryComponent->ToggleInventoryMenu();
+
+	if (InventoryComponent->IsMenuOpen())
+	{
+		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		HUDWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
 }
 
 void ASInv_PlayerController::TraceForItem()
