@@ -1,10 +1,8 @@
 ﻿#include "InventoryManagement/FastArray/SInv_FastArray.h"
-
-#include "ToolMenusEditor.h"
 #include "InventoryManagement/Components/SInv_InventoryComponent.h"
 #include "Items/SInv_InventoryItem.h"
 #include "Items/Components/SInv_ItemComponent.h"
-#include "Tests/ToolMenusTestUtilities.h"
+
 
 TArray<USInv_InventoryItem*> FSInv_InventoryFastArray::GetAllItems()
 {

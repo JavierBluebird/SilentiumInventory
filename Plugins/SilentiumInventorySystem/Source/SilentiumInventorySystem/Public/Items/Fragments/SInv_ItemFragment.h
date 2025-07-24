@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "IAutomationReport.h"
 #include "StructUtils/InstancedStruct.h"
 #include "Types/AttributeStorage.h"
 #include "SInv_ItemFragment.generated.h"
